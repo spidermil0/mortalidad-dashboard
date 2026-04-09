@@ -1,0 +1,2309 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Introducción – Análisis de Mortalidad</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-a0f9fd0d421825b736dc1bbcbcba2219.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./eda_VIS_Entregable2_web.html">Introducción</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Análisis de Mortalidad</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Análisis Exploratorio de Datos (EDA) sobre Mortalidad en Medellín (2012-2023)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./eda_VIS_Entregable2_web.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Introducción</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#problema" id="toc-problema" class="nav-link active" data-scroll-target="#problema">Problema</a></li>
+  <li><a href="#objetivo" id="toc-objetivo" class="nav-link" data-scroll-target="#objetivo">Objetivo</a></li>
+  <li><a href="#descripción-del-dataset" id="toc-descripción-del-dataset" class="nav-link" data-scroll-target="#descripción-del-dataset">Descripción del Dataset</a></li>
+  <li><a href="#carga-y-vista-preeliminar-del-dataset" id="toc-carga-y-vista-preeliminar-del-dataset" class="nav-link" data-scroll-target="#carga-y-vista-preeliminar-del-dataset">Carga y vista preeliminar del dataset</a></li>
+  <li><a href="#vista-inicial-de-los-datos" id="toc-vista-inicial-de-los-datos" class="nav-link" data-scroll-target="#vista-inicial-de-los-datos">Vista inicial de los datos</a></li>
+  <li><a href="#información-general-del-dataset" id="toc-información-general-del-dataset" class="nav-link" data-scroll-target="#información-general-del-dataset">Información general del dataset</a></li>
+  <li><a href="#estadísticas-descriptivas" id="toc-estadísticas-descriptivas" class="nav-link" data-scroll-target="#estadísticas-descriptivas">Estadísticas descriptivas</a></li>
+  <li><a href="#diccionario-de-variables" id="toc-diccionario-de-variables" class="nav-link" data-scroll-target="#diccionario-de-variables">Diccionario de variables</a></li>
+  <li><a href="#selección-de-variables-para-el-análisis" id="toc-selección-de-variables-para-el-análisis" class="nav-link" data-scroll-target="#selección-de-variables-para-el-análisis">Selección de variables para el análisis</a></li>
+  <li><a href="#variables-descartadas" id="toc-variables-descartadas" class="nav-link" data-scroll-target="#variables-descartadas">Variables descartadas</a></li>
+  <li><a href="#variables-seleccionadas-para-el-análisis" id="toc-variables-seleccionadas-para-el-análisis" class="nav-link" data-scroll-target="#variables-seleccionadas-para-el-análisis">Variables seleccionadas para el análisis</a>
+  <ul class="collapse">
+  <li><a href="#descartar-columnas-irrelevantes" id="toc-descartar-columnas-irrelevantes" class="nav-link" data-scroll-target="#descartar-columnas-irrelevantes">Descartar columnas irrelevantes</a></li>
+  <li><a href="#tratamiento-de-la-variable-etareo_quin" id="toc-tratamiento-de-la-variable-etareo_quin" class="nav-link" data-scroll-target="#tratamiento-de-la-variable-etareo_quin">Tratamiento de la variable <code>ETAREO_QUIN</code></a></li>
+  <li><a href="#tratamiento-de-la-variable-edad_simple" id="toc-tratamiento-de-la-variable-edad_simple" class="nav-link" data-scroll-target="#tratamiento-de-la-variable-edad_simple">Tratamiento de la variable <code>EDAD_SIMPLE</code></a></li>
+  <li><a href="#conversión-de-fecha" id="toc-conversión-de-fecha" class="nav-link" data-scroll-target="#conversión-de-fecha">Conversión de fecha</a></li>
+  <li><a href="#recodificación-de-variables-categóricas" id="toc-recodificación-de-variables-categóricas" class="nav-link" data-scroll-target="#recodificación-de-variables-categóricas">Recodificación de variables categóricas</a></li>
+  <li><a href="#limpieza-de-la-variable-objetivo" id="toc-limpieza-de-la-variable-objetivo" class="nav-link" data-scroll-target="#limpieza-de-la-variable-objetivo">Limpieza de la variable objetivo</a></li>
+  <li><a href="#ajustes-finales-del-dataset" id="toc-ajustes-finales-del-dataset" class="nav-link" data-scroll-target="#ajustes-finales-del-dataset">Ajustes finales del dataset</a></li>
+  </ul></li>
+  <li><a href="#análisis-univariado" id="toc-análisis-univariado" class="nav-link" data-scroll-target="#análisis-univariado">Análisis univariado</a>
+  <ul class="collapse">
+  <li><a href="#grupo-ops" id="toc-grupo-ops" class="nav-link" data-scroll-target="#grupo-ops">Grupo OPS</a></li>
+  <li><a href="#sexo" id="toc-sexo" class="nav-link" data-scroll-target="#sexo">Sexo</a></li>
+  <li><a href="#edad" id="toc-edad" class="nav-link" data-scroll-target="#edad">Edad</a></li>
+  </ul></li>
+  <li><a href="#análisis-bivariado-nom_667_ops_grupo-vs-variables-relevantes" id="toc-análisis-bivariado-nom_667_ops_grupo-vs-variables-relevantes" class="nav-link" data-scroll-target="#análisis-bivariado-nom_667_ops_grupo-vs-variables-relevantes">Análisis bivariado: <code>NOM_667_OPS_GRUPO</code> vs variables relevantes</a>
+  <ul class="collapse">
+  <li><a href="#grupo-ops-sexo" id="toc-grupo-ops-sexo" class="nav-link" data-scroll-target="#grupo-ops-sexo">5.1 Grupo OPS × Sexo</a></li>
+  <li><a href="#grupo-ops-grupo-etario" id="toc-grupo-ops-grupo-etario" class="nav-link" data-scroll-target="#grupo-ops-grupo-etario">5.2 Grupo OPS × Grupo etario</a></li>
+  <li><a href="#grupo-ops-año" id="toc-grupo-ops-año" class="nav-link" data-scroll-target="#grupo-ops-año">Grupo OPS × Año</a></li>
+  <li><a href="#grupo-ops-régimen-de-seguridad-social" id="toc-grupo-ops-régimen-de-seguridad-social" class="nav-link" data-scroll-target="#grupo-ops-régimen-de-seguridad-social">Grupo OPS × Régimen de seguridad social</a></li>
+  <li><a href="#grupo-ops-nivel-educativo" id="toc-grupo-ops-nivel-educativo" class="nav-link" data-scroll-target="#grupo-ops-nivel-educativo">Grupo OPS × Nivel educativo</a></li>
+  <li><a href="#grupo-ops-comuna-de-residencia" id="toc-grupo-ops-comuna-de-residencia" class="nav-link" data-scroll-target="#grupo-ops-comuna-de-residencia">Grupo OPS × Comuna de residencia</a></li>
+  </ul></li>
+  <li><a href="#dataset-final" id="toc-dataset-final" class="nav-link" data-scroll-target="#dataset-final">Dataset final</a></li>
+  <li><a href="#conclusiones-y-hallazgos" id="toc-conclusiones-y-hallazgos" class="nav-link" data-scroll-target="#conclusiones-y-hallazgos">Conclusiones y hallazgos</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Introducción</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>El estudio de la mortalidad en una población es fundamental para comprender los patrones de salud, identificar grupos de riesgo y orientar la formulación de políticas públicas. En la ciudad de Medellín, el registro de defunciones es gestionado por las Instituciones Prestadoras de Servicios de Salud (IPS), las cuales recopilan información de carácter demográfico, geográfico, temporal y clínico asociada a cada fallecimiento.</p>
+<p>El presente proyecto tiene como propósito desarrollar un Análisis Exploratorio de Datos (EDA) sobre el conjunto de datos de mortalidad en Medellín, el cual contiene aproximadamente 145.000 registros correspondientes al período 2012–2023. Esta información es suministrada por la Secretaría de Salud a través de la plataforma de datos abiertos MeData.</p>
+<p>Adicionalmente, este análisis servirá como base para la construcción de dashboards interactivos en herramientas como Dash (Python) y Shiny (R), facilitando la visualización de los hallazgos y su interpretación por parte de tomadores de decisiones.</p>
+<hr>
+<section id="problema" class="level2">
+<h2 class="anchored" data-anchor-id="problema">Problema</h2>
+<p>A pesar de que el sistema de registro de defunciones en Medellín recopila una amplia variedad de variables —incluyendo aspectos demográficos, geográficos, socioeconómicos, temporales y relacionados con la causa de muerte—, la magnitud y complejidad del dataset dificultan la identificación rápida de patrones relevantes.</p>
+<p>Entre las principales dificultades se encuentran:</p>
+<ul>
+<li>Identificación de tendencias y comportamientos temporales en las defunciones</li>
+<li>Análisis de diferencias territoriales entre comunas y barrios</li>
+<li>Caracterización de la población según variables como sexo, edad y nivel educativo</li>
+<li>Presencia de valores faltantes o inconsistentes que afectan la calidad del análisis</li>
+</ul>
+<p>Además, algunas variables presentan codificaciones específicas que requieren transformación previa para su correcta interpretación, como es el caso de la variable <code>EDAD</code> en su formato original.</p>
+<p>En este contexto, resulta necesario aplicar un proceso sistemático de exploración y depuración de los datos que permita comprender su estructura, mejorar su calidad y facilitar la extracción de información relevante.</p>
+<hr>
+</section>
+<section id="objetivo" class="level2">
+<h2 class="anchored" data-anchor-id="objetivo">Objetivo</h2>
+<p><strong>Objetivo general:</strong> Realizar un Análisis Exploratorio de Datos (EDA) sobre el conjunto de información de mortalidad en Medellín entre 2012 y 2023, con el fin de identificar patrones relevantes y preparar los datos para la construcción de visualizaciones interactivas y modelos predictivos.</p>
+<p><strong>Objetivos específicos:</strong></p>
+<ul>
+<li>Describir la estructura del dataset, incluyendo tipos de variables, valores nulos y posibles duplicados</li>
+<li>Analizar la distribución de la variable objetivo <code>NOM_667_OPS_GRUPO</code></li>
+<li>Caracterizar el perfil sociodemográfico de los fallecidos (sexo, edad, estado civil y nivel educativo)</li>
+<li>Explorar la evolución temporal de las defunciones por año y mes</li>
+<li>Analizar la distribución geográfica de las defunciones por comuna y barrio</li>
+<li>Identificar relaciones entre la variable objetivo y otras variables relevantes mediante análisis bivariado</li>
+<li>Seleccionar variables útiles para la construcción de un modelo de clasificación</li>
+</ul>
+<hr>
+</section>
+<section id="descripción-del-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="descripción-del-dataset">Descripción del Dataset</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Atributo</th>
+<th>Detalle</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Fuente</strong></td>
+<td>MeData — Alcaldía de Medellín / Secretaría de Salud</td>
+</tr>
+<tr class="even">
+<td><strong>URL</strong></td>
+<td>https://medata.gov.co/node/16570</td>
+</tr>
+<tr class="odd">
+<td><strong>Período</strong></td>
+<td>2012 – 2023</td>
+</tr>
+<tr class="even">
+<td><strong>Registros</strong></td>
+<td>~145.000 defunciones</td>
+</tr>
+<tr class="odd">
+<td><strong>Variables</strong></td>
+<td>26 columnas</td>
+</tr>
+<tr class="even">
+<td><strong>Última actualización</strong></td>
+<td>Septiembre 2023</td>
+</tr>
+<tr class="odd">
+<td><strong>Licencia</strong></td>
+<td>Creative Commons CC BY-SA 4.0</td>
+</tr>
+<tr class="even">
+<td><strong>Ruta local</strong></td>
+<td><code>D:/Descargas/defunciones.csv</code></td>
+</tr>
+</tbody>
+</table>
+<p>Este conjunto de datos contiene información detallada sobre las defunciones registradas en Medellín, incluyendo variables relacionadas con las características de los individuos, su ubicación, condiciones sociales y causas de muerte. La variable de interés principal corresponde a NOM_667_OPS_GRUPO, la cual agrupa las causas de muerte según la clasificación OPS</p>
+<hr>
+</section>
+<section id="carga-y-vista-preeliminar-del-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="carga-y-vista-preeliminar-del-dataset">Carga y vista preeliminar del dataset</h2>
+<p>A continuación se presentan las principales características del conjunto de datos de defunciones, con el fin de comprender su estructura, tipo de variables y calidad de la información antes de realizar el análisis exploratorio.</p>
+<div id="f9c4b81d" class="cell" data-execution_count="545">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.ticker <span class="im">as</span> mticker</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">"display.max_columns"</span>, <span class="dv">40</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">"display.float_format"</span>, <span class="st">"</span><span class="sc">{:,.2f}</span><span class="st">"</span>.<span class="bu">format</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="35590c7a" class="cell" data-execution_count="546">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_raw <span class="op">=</span> pd.read_csv(<span class="st">"defunciones.csv"</span>, low_memory<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shape original: </span><span class="sc">{</span>df_raw<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Shape original: (145377, 26)</code></pre>
+</div>
+</div>
+<p>El dataset contiene 145,377 registros y 26 variables. Se trata de un volumen de datos considerable, suficiente para realizar análisis exploratorios robustos y construir modelos predictivos sin problemas de tamaño muestral.</p>
+</section>
+<section id="vista-inicial-de-los-datos" class="level2">
+<h2 class="anchored" data-anchor-id="vista-inicial-de-los-datos">Vista inicial de los datos</h2>
+<div id="6fbe95d1" class="cell" data-execution_count="547">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_raw.head().T</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="547">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">0</th>
+<th data-quarto-table-cell-role="th">1</th>
+<th data-quarto-table-cell-role="th">2</th>
+<th data-quarto-table-cell-role="th">3</th>
+<th data-quarto-table-cell-role="th">4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">NUM_FORMUL</th>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">COD_INST</th>
+<td>NaN</td>
+<td>050010214401</td>
+<td>050010590901</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">NOM_INST</th>
+<td>NaN</td>
+<td>EMPRESA SOCIAL DEL ESTADO HOSPITAL GENERAL DE ...</td>
+<td>IPS UNIVERSIDA DE ANTIOQUIA IPS UNIVERSITARIA</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">TIPO_DEFUN</th>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">FECHA_DEF</th>
+<td>02/01/2012</td>
+<td>02/01/2012</td>
+<td>02/01/2012</td>
+<td>02/01/2012</td>
+<td>02/01/2012</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">ANO</th>
+<td>2012</td>
+<td>2012</td>
+<td>2012</td>
+<td>2012</td>
+<td>2012</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">MES</th>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">SEXO</th>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">EST_CIVIL</th>
+<td>9</td>
+<td>5</td>
+<td>9</td>
+<td>9</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">EDAD</th>
+<td>4051</td>
+<td>4026</td>
+<td>4065</td>
+<td>4029</td>
+<td>4032</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">NIVEL_EDU</th>
+<td>99</td>
+<td>99</td>
+<td>99</td>
+<td>3</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">CODPTORE</th>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">CODMUNRE</th>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">COD_BARRIRES</th>
+<td>9999</td>
+<td>1404</td>
+<td>402</td>
+<td>107</td>
+<td>710</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">SEG_SOCIAL</th>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">IDADMISALUD</th>
+<td>1.00</td>
+<td>2.00</td>
+<td>1.00</td>
+<td>2.00</td>
+<td>1.00</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">IDCODADMI</th>
+<td>EPS037</td>
+<td>EPS020</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">IDCLASADMI</th>
+<td>NUEVA EPS SA</td>
+<td>CAPRECOM - CAJA DE PREVISION SOCIAL DE COMUNIC...</td>
+<td>CAFESALUD MEDICINA PREPAGADA S.A.</td>
+<td>CAFESALUD MEDICINA PREPAGADA S.A.</td>
+<td>COOMEVA S.A. - ENTIDAD PROMOTORA DE SALUD</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">N_BAS1</th>
+<td>EXPOSICION A FACTORES NO ESPECIFICADOS QUE CAU...</td>
+<td>PEATON LESIONADO EN ACCIDENTE DE TRANSITO NO E...</td>
+<td>PEATON LESIONADO POR COLISION CON VEHICULO DE ...</td>
+<td>AGRESION CON DISPARO DE OTRAS ARMAS DE FUEGO Y...</td>
+<td>LESION AUTOINFLIGIDA INTENCIONALMENTE POR DISP...</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">C_BAS1</th>
+<td>X599</td>
+<td>V093</td>
+<td>V021</td>
+<td>X954</td>
+<td>X744</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">BARRIO_RES</th>
+<td>Sin informacion</td>
+<td>Castropol</td>
+<td>San Isidro</td>
+<td>San Pablo</td>
+<td>López de Mesa</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">COMUNA_RES</th>
+<td>Sin informacion</td>
+<td>14 El Poblado</td>
+<td>04 Aranjuez</td>
+<td>01 Popular</td>
+<td>07 Robledo</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">ETAREO_QUIN</th>
+<td>50-54</td>
+<td>25-29</td>
+<td>65-69</td>
+<td>25-29</td>
+<td>30-34</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">EDAD_SIMPLE</th>
+<td>51</td>
+<td>26</td>
+<td>65</td>
+<td>29</td>
+<td>32</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">NOM_667_OPS_GRUPO</th>
+<td>Causas externas</td>
+<td>Causas externas</td>
+<td>Causas externas</td>
+<td>Causas externas</td>
+<td>Causas externas</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">NOM_667_OPS_SUBC</th>
+<td>Los demas accidentes</td>
+<td>Accidentes de transporte terrestre</td>
+<td>Accidentes de transporte terrestre</td>
+<td>Agresiones (homicidios)</td>
+<td>Lesiones auto infligidas intencionalmente</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Se observa la estructura general del dataset, incluyendo variables demográficas, geográficas, temporales y de causa de muerte. Se identifican valores faltantes en columnas como COD_INST y NOM_INST, así como la presencia de valores categóricos como “Sin informacion”, que requerirán tratamiento posterior</p>
+</section>
+<section id="información-general-del-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="información-general-del-dataset">Información general del dataset</h2>
+<div id="7800fcd6" class="cell" data-execution_count="548">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_raw.info()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 145377 entries, 0 to 145376
+Data columns (total 26 columns):
+ #   Column             Non-Null Count   Dtype  
+---  ------             --------------   -----  
+ 0   NUM_FORMUL         145377 non-null  int64  
+ 1   COD_INST           133469 non-null  object 
+ 2   NOM_INST           133629 non-null  object 
+ 3   TIPO_DEFUN         145377 non-null  int64  
+ 4   FECHA_DEF          145377 non-null  object 
+ 5   ANO                145377 non-null  int64  
+ 6   MES                145377 non-null  int64  
+ 7   SEXO               145377 non-null  int64  
+ 8   EST_CIVIL          145377 non-null  int64  
+ 9   EDAD               145377 non-null  int64  
+ 10  NIVEL_EDU          145377 non-null  int64  
+ 11  CODPTORE           145377 non-null  int64  
+ 12  CODMUNRE           145377 non-null  int64  
+ 13  COD_BARRIRES       145377 non-null  object 
+ 14  SEG_SOCIAL         145377 non-null  int64  
+ 15  IDADMISALUD        139689 non-null  float64
+ 16  IDCODADMI          140008 non-null  object 
+ 17  IDCLASADMI         139680 non-null  object 
+ 18  N_BAS1             145377 non-null  object 
+ 19  C_BAS1             145377 non-null  object 
+ 20  BARRIO_RES         145377 non-null  object 
+ 21  COMUNA_RES         145377 non-null  object 
+ 22  ETAREO_QUIN        145377 non-null  object 
+ 23  EDAD_SIMPLE        145377 non-null  object 
+ 24  NOM_667_OPS_GRUPO  145377 non-null  object 
+ 25  NOM_667_OPS_SUBC   145377 non-null  object 
+dtypes: float64(1), int64(11), object(14)
+memory usage: 28.8+ MB</code></pre>
+</div>
+</div>
+<p>La mayoría de las variables no presentan valores nulos, aunque algunas columnas administrativas (COD_INST, NOM_INST, IDADMISALUD, IDCODADMI, IDCLASADMI) tienen datos faltantes. Se identifican variables tipo object que representan categorías, y variables como FECHA_DEF que deberían convertirse a formato de fecha para facilitar el análisis temporal.</p>
+</section>
+<section id="estadísticas-descriptivas" class="level2">
+<h2 class="anchored" data-anchor-id="estadísticas-descriptivas">Estadísticas descriptivas</h2>
+<div id="57552d65" class="cell" data-execution_count="549">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df_raw.describe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="549">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">NUM_FORMUL</th>
+<th data-quarto-table-cell-role="th">TIPO_DEFUN</th>
+<th data-quarto-table-cell-role="th">ANO</th>
+<th data-quarto-table-cell-role="th">MES</th>
+<th data-quarto-table-cell-role="th">SEXO</th>
+<th data-quarto-table-cell-role="th">EST_CIVIL</th>
+<th data-quarto-table-cell-role="th">EDAD</th>
+<th data-quarto-table-cell-role="th">NIVEL_EDU</th>
+<th data-quarto-table-cell-role="th">CODPTORE</th>
+<th data-quarto-table-cell-role="th">CODMUNRE</th>
+<th data-quarto-table-cell-role="th">SEG_SOCIAL</th>
+<th data-quarto-table-cell-role="th">IDADMISALUD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>145,377.00</td>
+<td>145,377.00</td>
+<td>145,377.00</td>
+<td>145,377.00</td>
+<td>145,377.00</td>
+<td>145,377.00</td>
+<td>145,377.00</td>
+<td>145,377.00</td>
+<td>145,377.00</td>
+<td>145,377.00</td>
+<td>145,377.00</td>
+<td>139,689.00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>72,689.00</td>
+<td>2.00</td>
+<td>2,016.97</td>
+<td>6.57</td>
+<td>1.48</td>
+<td>5.02</td>
+<td>4,039.33</td>
+<td>26.15</td>
+<td>5.00</td>
+<td>1.00</td>
+<td>1.65</td>
+<td>1.64</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">std</th>
+<td>41,966.87</td>
+<td>0.00</td>
+<td>2.94</td>
+<td>3.45</td>
+<td>0.50</td>
+<td>1.81</td>
+<td>269.63</td>
+<td>39.74</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>1.20</td>
+<td>1.33</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">min</th>
+<td>1.00</td>
+<td>2.00</td>
+<td>2,012.00</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>5.00</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>36,345.00</td>
+<td>2.00</td>
+<td>2,014.00</td>
+<td>4.00</td>
+<td>1.00</td>
+<td>4.00</td>
+<td>4,058.00</td>
+<td>2.00</td>
+<td>5.00</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>72,689.00</td>
+<td>2.00</td>
+<td>2,017.00</td>
+<td>7.00</td>
+<td>1.00</td>
+<td>5.00</td>
+<td>4,073.00</td>
+<td>3.00</td>
+<td>5.00</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>109,033.00</td>
+<td>2.00</td>
+<td>2,020.00</td>
+<td>10.00</td>
+<td>2.00</td>
+<td>6.00</td>
+<td>4,084.00</td>
+<td>13.00</td>
+<td>5.00</td>
+<td>1.00</td>
+<td>2.00</td>
+<td>2.00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">max</th>
+<td>145,377.00</td>
+<td>2.00</td>
+<td>2,021.00</td>
+<td>12.00</td>
+<td>3.00</td>
+<td>9.00</td>
+<td>9,999.00</td>
+<td>99.00</td>
+<td>5.00</td>
+<td>1.00</td>
+<td>9.00</td>
+<td>9.00</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Las variables numéricas presentan rangos amplios, especialmente en EDAD, lo que sugiere que su codificación no es directa y requiere transformación. Además, variables categóricas codificadas como números (SEXO, EST_CIVIL, NIVEL_EDU) necesitan ser interpretadas según su diccionario de datos.</p>
+</section>
+<section id="diccionario-de-variables" class="level2">
+<h2 class="anchored" data-anchor-id="diccionario-de-variables">Diccionario de variables</h2>
+<p>Se realiza una descripción de las variables del conjunto de datos de defunciones, utilizando la información de la documentación y dando contexto de qué representa cada variable.</p>
+<ul>
+<li><p><strong>NUM_FORMUL (Número consecutivo):</strong> Corresponde a un número de orden único y secuencial asignado a cada registro de defunción dentro de la base de datos. Sirve como identificador único para diferenciar un caso de otro, facilitando la organización y referencia de los datos.</p></li>
+<li><p><strong>COD_INST (Identificador alfanumérico):</strong> Código único que identifica la institución de salud (hospital, clínica, centro de salud) que reportó o donde ocurrió la defunción. Permite vincular el fallecimiento con el prestador de servicios de salud.</p></li>
+<li><p><strong>NOMB_INST (Categórica):</strong> Nombre completo de la institución de salud correspondiente al código COD_INST. Ejemplos: “Hospital Universitario del Caribe”, “Clínica La Misericordia”.</p></li>
+<li><p><strong>TIPO_DEFUN (Categórica codificada):</strong> Clasifica el tipo de defunción según las normas sanitarias. Puede ser:</p>
+<ul>
+<li><p><strong>1 = Defunción Fetal:</strong> Muerte de un producto de la concepción antes de su expulsión o extracción completa del cuerpo de la madre, independientemente de la duración del embarazo.</p></li>
+<li><p><strong>2 = Defunción No Fetal:</strong> Muerte de una persona que ha nacido con vida (independientemente de la edad).</p></li>
+</ul></li>
+<li><p><strong>FECHA_DEFUN (Serie temporal):</strong> Fecha exacta en la que ocurrió el fallecimiento. Es el dato temporal más preciso para el evento. Su formato suele ser DD/MM/AAAA o similar.</p></li>
+<li><p><strong>ANO (Serie temporal - Año):</strong> Año calendario en el que se produjo la defunción. Se extrae de FECHA_DEFUN y es útil para agrupar datos por años.</p></li>
+<li><p><strong>MES (Serie temporal - Mes):</strong> Mes del año en el que se produjo la defunción. Complementa a ANO y FECHA_DEFUN para análisis estacionales o mensuales.</p></li>
+<li><p><strong>SEXO (Categórica codificada):</strong> Sexo biológico de la persona fallecida, registrado según el certificado de defunción. Sus valores son:</p>
+<ul>
+<li><strong>1 = Masculino</strong></li>
+<li><strong>2 = Femenino</strong></li>
+<li><strong>3 = Indeterminado</strong> (usado en casos donde no fue posible determinar el sexo, comúnmente en defunciones fetales o neonatales).</li>
+</ul></li>
+<li><p><strong>EST_CIVIL (Categórica codificada):</strong> Estado civil de la persona fallecida al momento de su muerte. Proporciona información sociodemográfica relevante.</p>
+<ul>
+<li><strong>1 =</strong> No estaba casado(a) y llevaba dos o más años viviendo con su pareja (Unión Libre estable)</li>
+<li><strong>2 =</strong> No estaba casado(a) y llevaba menos de dos años viviendo con su pareja (Unión Libre reciente)</li>
+<li><strong>3 =</strong> Estaba separado(a) o divorciado(a)</li>
+<li><strong>4 =</strong> Estaba viudo(a)</li>
+<li><strong>5 =</strong> Estaba soltero(a) (nunca se casó ni vivió en unión libre)</li>
+<li><strong>6 =</strong> Estaba casado(a)</li>
+<li><strong>9 =</strong> Sin información</li>
+</ul></li>
+<li><p><strong>EDAD (Categórica codificada como texto):</strong> Variable compleja que codifica la edad al momento de la muerte con un formato especial de 4 dígitos. Es fundamental para estudios de mortalidad en todas las edades, especialmente en la primera infancia. Estructura:</p>
+<ul>
+<li><strong>0000 a 0059:</strong> Edad en minutos (ej: 0001 = 1 minuto)</li>
+<li><strong>0099:</strong> Menor de una hora, pero sin información de minutos exactos</li>
+<li><strong>1001 a 1023:</strong> Edad en horas (ej: 1005 = 5 horas)</li>
+<li><strong>1099:</strong> Menor de un día, pero sin información de horas exactas</li>
+<li><strong>2001 a 2029:</strong> Edad en días (ej: 2015 = 15 días de vida)</li>
+<li><strong>2099:</strong> Menor de un mes, pero sin información de días exactos</li>
+<li><strong>3001 a 3011:</strong> Edad en meses (ej: 3009 = 9 meses)</li>
+<li><strong>3099:</strong> Menor de un año, pero sin información de meses exactos</li>
+<li><strong>4001 a 4098:</strong> Edad en años (ej: 4030 = 30 años)</li>
+<li><strong>4099:</strong> 99 años</li>
+<li><strong>4100 a 4120:</strong> Edad de 100 a 120 años</li>
+<li><strong>4999:</strong> Mayor de un año, pero edad desconocida</li>
+<li><strong>4000:</strong> Mujer en edad fértil (generalmente 15-49 años), sin información de edad</li>
+<li><strong>8888:</strong> Sin información de edad</li>
+<li><strong>9999:</strong> Edad completamente desconocida</li>
+</ul></li>
+<li><p><strong>NIVEL_EDU (Categórica codificada):</strong> Máximo nivel educativo alcanzado por la persona fallecida. Es un indicador socioeconómico clave.</p>
+<ul>
+<li><strong>1 = Preescolar</strong></li>
+<li><strong>2 = Básica primaria</strong> (1º a 5º)</li>
+<li><strong>3 = Básica secundaria</strong> (6º a 9º)</li>
+<li><strong>4 = Media académica o clásica</strong> (10º y 11º)</li>
+<li><strong>5 = Media técnica</strong></li>
+<li><strong>6 = Normalista</strong> (formación de docentes)</li>
+<li><strong>7 = Técnica profesional</strong></li>
+<li><strong>8 = Tecnológica</strong></li>
+<li><strong>9 = Profesional</strong> (universitaria)</li>
+<li><strong>10 = Especialización</strong></li>
+<li><strong>11 = Maestría</strong></li>
+<li><strong>12 = Doctorado</strong></li>
+<li><strong>13 = Ninguno</strong></li>
+<li><strong>99 = Sin información</strong></li>
+</ul></li>
+<li><p><strong>CODPTORE (Identificador numérico):</strong> Código numérico del departamento de residencia habitual del fallecido, según la División Político-Administrativa del DANE.</p>
+<ul>
+<li><strong>01</strong> = Sin información de departamento</li>
+<li><strong>75</strong> = Con residencia en el extranjero</li>
+</ul></li>
+<li><p><strong>CODMUNRE (Identificador numérico):</strong> Código numérico del municipio de residencia habitual del fallecido. Complementa a CODPTORE.</p>
+<ul>
+<li><p><strong>999 =</strong> Sin información de municipio.</p></li>
+<li><p>Para residentes en el extranjero, se usa el código del país.</p></li>
+</ul></li>
+<li><p><strong>CODBARRIRES (Identificador numérico):</strong> Código numérico del barrio de residencia del fallecido. Permite un nivel de desagregación geográfico muy fino (nivel de barrio).</p></li>
+<li><p><strong>SEG_SOCIAL (Categórica codificada):</strong> Régimen de afiliación al Sistema General de Seguridad Social en Salud (SGSSS) que tenía el fallecido.</p>
+<ul>
+<li><strong>1 = Contributivo:</strong> Para trabajadores formales y sus familias</li>
+<li><strong>2 = Subsidiado:</strong> Para población de bajos recursos</li>
+<li><strong>3 = Excepción:</strong> Poblaciones especiales (jubilados, fuerzas militares, etc.)</li>
+<li><strong>4 = Especial:</strong> Comunidades indígenas, magisterio, etc.</li>
+<li><strong>5 = No asegurado:</strong> Sin afiliación a salud</li>
+</ul></li>
+<li><p><strong>IDADMISALU (Categórica codificada):</strong> Tipo de Entidad Administradora de salud a la que pertenecía el fallecido.</p>
+<ul>
+<li><strong>1 = Entidad Promotora de Salud (EPS)</strong> del régimen contributivo</li>
+<li><strong>2 = EPS</strong> del régimen subsidiado</li>
+<li><strong>3 = Entidad Adaptada de Salud</strong> (antiguas cajas de previsión)</li>
+<li><strong>4 = Entidad Especial de Salud</strong> (indígenas, etc.)</li>
+<li><strong>5 = Entidad Exceptuada de Salud</strong> (Fuerzas Militares, Policía Nacional)</li>
+<li><strong>9 = Sin información</strong></li>
+</ul></li>
+<li><p><strong>IDCODADMI (Identificador numérico):</strong> Código único oficial que identifica a la administradora de salud (EPS, ARS, etc.) a la que estaba afiliado el fallecido.</p></li>
+<li><p><strong>IDCLASADMI (Categórica):</strong> Nombre comercial o razón social de la entidad administradora de salud (ej. “Nueva EPS”, “Salud Total”, “Savia Salud”).</p></li>
+<li><p><strong>N_BAS1 (Categórica - Texto):</strong> Descripción textual, en lenguaje natural, de la causa básica de defunción. Esta es la enfermedad o lesión que inició la cadena de eventos que llevaron directamente a la muerte (ej. “Infarto agudo de miocardio”, “Accidente de tránsito”).</p></li>
+<li><p><strong>C_BAS1 (Categórica - Código):</strong> Código alfanumérico de la causa básica de defunción según la Clasificación Internacional de Enfermedades, versión 10 (CIE-10). Es la versión estandarizada del código. Por ejemplo: I21 para “Infarto agudo de miocardio”.</p></li>
+<li><p><strong>BARRIO_RES (Categórica):</strong> Nombre del barrio de residencia habitual del fallecido. Es la versión textual del código CODBARRIRES. Ejemplo: “El Prado”, “Las Américas”.</p></li>
+<li><p><strong>COMUNA_RES (Categórica):</strong> Nombre o número de la comuna (división administrativa urbana que agrupa varios barrios) donde residía el fallecido. Útil para análisis urbanos.</p></li>
+<li><p><strong>ETAREO_QUIN (Categórica):</strong> Grupo de edad quinquenal al que pertenece el fallecido. Es una categorización de EDAD_SIMPLE para análisis demográficos estandarizados. Ejemplo: “00-04 años”, “05-09 años”, “80 y más”.</p></li>
+<li><p><strong>EDAD_SIMPLE (Numérica discreta):</strong> Edad puntual del fallecido en años cumplidos. A diferencia de EDAD, esta variable es numérica simple y continua (ej: 25, 0, 102). Es la más práctica para cálculos estadísticos y gráficos.</p></li>
+<li><p><strong>NOM_6/67_OPS_GRUPO (Categórica):</strong> Nombre del grupo de causas de muerte según la lista reducida de tabulación “6/67” de la Organización Panamericana de la Salud (OPS). Agrupa códigos CIE-10 en categorías amplias. Ejemplo: “Enfermedades del sistema circulatorio”.</p></li>
+<li><p><strong>NOM_6/67_OPS_SUBC (Categórica):</strong> Nombre de la subcategoría dentro de la lista “6/67 OPS”. Es un nivel más detallado que el grupo, pero sigue siendo una agrupación de causas. Ejemplo: “Enfermedades isquémicas del corazón” (que pertenece al grupo de “Enfermedades del sistema circulatorio”).</p></li>
+</ul>
+</section>
+<section id="selección-de-variables-para-el-análisis" class="level2">
+<h2 class="anchored" data-anchor-id="selección-de-variables-para-el-análisis">Selección de variables para el análisis</h2>
+<p>Una vez revisado el diccionario de variables y la estructura del dataset, se realiza una selección de aquellas variables que realmente aportan al análisis de la variable objetivo NOM_667_OPS_GRUPO.</p>
+<p>El objetivo de este paso es trabajar con un conjunto de datos más limpio y enfocado, evitando incluir información redundante o que no aporte al entendimiento de las causas de muerte.</p>
+<p>Adicionalmente, se identifican variables que contienen la misma información en diferentes formatos. En estos casos, se selecciona la versión más adecuada para el análisis, priorizando claridad y facilidad de interpretación.</p>
+</section>
+<section id="variables-descartadas" class="level2">
+<h2 class="anchored" data-anchor-id="variables-descartadas">Variables descartadas</h2>
+<p>A continuación, se presentan las variables que no serán utilizadas en el análisis, junto con la justificación correspondiente:</p>
+<ul>
+<li><code>NUM_FORMUL</code>: corresponde a un identificador único de cada registro, por lo que no aporta información relevante para el análisis.</li>
+<li><code>COD_INST</code>, <code>NOM_INST</code>: hacen referencia a la institución que reporta el caso. Aunque son útiles a nivel administrativo, no aportan directamente al análisis de las causas de muerte.</li>
+<li><code>IDADMISALUD</code>, <code>IDCODADMI</code>, <code>IDCLASADMI</code>: variables relacionadas con la administración del sistema de salud. Su utilidad es principalmente operativa, por lo que no son relevantes para este estudio.</li>
+<li><code>C_BAS1</code>, <code>N_BAS1</code>: contienen el código y la descripción específica de la causa de muerte según CIE-10. Sin embargo, la variable objetivo (<code>NOM_667_OPS_GRUPO</code>) se construye a partir de esta información, por lo que incluirlas en el análisis sería redundante y podría sesgar los resultados.</li>
+<li><code>NOM_667_OPS_SUBC</code>: representa una subclasificación más detallada de la variable objetivo, por lo que incluirla implicaría trabajar con información muy similar a la variable que se desea analizar.</li>
+<li><code>CODPTORE</code>: variable asociada a pertenencia étnica, la cual presenta una alta cantidad de valores faltantes y no aporta significativamente al objetivo del análisis.</li>
+<li><code>COD_BARRIRES</code>: código numérico del barrio que resulta redundante, ya que se cuenta con la variable BARRIO_RES en formato descriptivo.</li>
+<li><code>EDAD</code>: aunque contiene información detallada sobre la edad, su formato codificado requiere transformaciones adicionales. Dado que se dispone de la variable <code>EDAD_SIMPLE</code>, que ya expresa la edad en años de forma directa, se decide utilizar esta última y descartar EDAD para evitar redundancia.</li>
+</ul>
+</section>
+<section id="variables-seleccionadas-para-el-análisis" class="level2">
+<h2 class="anchored" data-anchor-id="variables-seleccionadas-para-el-análisis">Variables seleccionadas para el análisis</h2>
+<p>Las siguientes variables se consideran relevantes para el análisis, ya que permiten caracterizar las defunciones desde diferentes dimensiones: | Variable | Tipo | Observaciones | | ——————- | —————– | ————————————————————– | | <code>NOM_667_OPS_GRUPO</code> | Variable objetivo | Se analizará su distribución y relación con otras variables | | <code>ANO</code>, <code>MES</code> | Temporales | Permiten analizar tendencias en el tiempo | | <code>FECHA_DEF</code> | Temporal | Se utiliza para el manejo y validación de la información temporal | | <code>SEXO</code> | Demográfica | Requiere recodificación para facilitar su interpretación | | <code>EDAD_SIMPLE</code> | Demográfica | Se utilizará como medida principal de edad | | <code>ETAREO_QUIN</code> | Demográfica | Agrupación por rangos de edad | | <code>EST_CIVIL</code> | Demográfica | Requiere recodificación | | <code>NIVEL_EDU</code> | Socioeconómica | Puede agruparse para simplificar el análisis | | <code>SEG_SOCIAL</code> | Socioeconómica | Requiere interpretación de categorías | | <code>TIPO_DEFUN</code> | Clasificatoria | Permite diferenciar tipos de defunción | | <code>COMUNA_RES</code> | Geográfica | Útil para análisis territorial | | <code>BARRIO_RES</code> | Geográfica | Nivel de detalle más específico, útil para visualización |</p>
+<section id="descartar-columnas-irrelevantes" class="level3">
+<h3 class="anchored" data-anchor-id="descartar-columnas-irrelevantes">Descartar columnas irrelevantes</h3>
+<div id="429785d1" class="cell" data-execution_count="550">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Columnas a descartar</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>DROP_COLS <span class="op">=</span> [</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NUM_FORMUL"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"COD_INST"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NOM_INST"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"IDADMISALUD"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"IDCODADMI"</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"IDCLASADMI"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"C_BAS1"</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"N_BAS1"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NOM_667_OPS_SUBC"</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"CODPTORE"</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"COD_BARRIRES"</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"EDAD"</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>drop_existing <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> DROP_COLS <span class="cf">if</span> c <span class="kw">in</span> df_raw.columns]</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df_raw.drop(columns<span class="op">=</span>drop_existing).copy()</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Columnas originales : </span><span class="sc">{</span>df_raw<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Columnas descartadas: </span><span class="sc">{</span><span class="bu">len</span>(drop_existing)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Columnas retenidas  : </span><span class="sc">{</span>df<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Columnas finales: </span><span class="sc">{</span><span class="bu">list</span>(df.columns)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Columnas originales : 26
+Columnas descartadas: 12
+Columnas retenidas  : 14
+
+Columnas finales: ['TIPO_DEFUN', 'FECHA_DEF', 'ANO', 'MES', 'SEXO', 'EST_CIVIL', 'NIVEL_EDU', 'CODMUNRE', 'SEG_SOCIAL', 'BARRIO_RES', 'COMUNA_RES', 'ETAREO_QUIN', 'EDAD_SIMPLE', 'NOM_667_OPS_GRUPO']</code></pre>
+</div>
+</div>
+</section>
+<section id="tratamiento-de-la-variable-etareo_quin" class="level3">
+<h3 class="anchored" data-anchor-id="tratamiento-de-la-variable-etareo_quin">Tratamiento de la variable <code>ETAREO_QUIN</code></h3>
+<p>La variable <code>ETAREO_QUIN</code> representa la edad agrupada en intervalos de cinco años. Aunque esta información puede derivarse a partir de <code>EDAD_SIMPLE</code>, se decide conservarla ya que facilita el análisis categórico y la construcción de visualizaciones, especialmente en etapas posteriores como el desarrollo de dashboards. Así que se decide hacer un análisis de dicha variable.</p>
+<div id="e617001b" class="cell" data-execution_count="551">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"ETAREO_QUIN"</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="551">
+<pre><code>ETAREO_QUIN
+80-84                         17927
+85-89                         17052
+75-79                         16206
+70-74                         14462
+65-69                         12820
+90-94                         11404
+60-64                         10919
+55-59                          8546
+50-54                          6032
+95-99                          4831
+45-49                          4063
+30-34                          3014
+25-29                          3008
+40-44                          2992
+35-39                          2901
+20-24                          2841
+&lt; 1 año                        2162
+15-19                          1809
+100 y mas                      1256
+10-14                           356
+1-4                             332
+5-9                             223
+oct-14                           77
+1-abr                            53
+5-sep                            52
+Mayor de 2 años y sin inf.       25
+Sin información                  11
+Edad desconocida                  3
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+<p>La variable <code>ETAREO_QUIN</code> representa la edad agrupada en intervalos de cinco años. Inicialmente, se identificaron algunas categorías inconsistentes como <code>oct-14</code>, <code>1-abr</code> y <code>5-sep</code>, las cuales no corresponden a rangos válidos de edad.</p>
+<div id="0674b26d" class="cell" data-execution_count="552">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df[[<span class="st">"EDAD_SIMPLE"</span>, <span class="st">"ETAREO_QUIN"</span>]].sample(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="552">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">EDAD_SIMPLE</th>
+<th data-quarto-table-cell-role="th">ETAREO_QUIN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">122181</th>
+<td>77</td>
+<td>75-79</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">66260</th>
+<td>73</td>
+<td>70-74</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">86838</th>
+<td>65</td>
+<td>65-69</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">51620</th>
+<td>46</td>
+<td>45-49</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">77476</th>
+<td>60</td>
+<td>60-64</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3858</th>
+<td>62</td>
+<td>60-64</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">136280</th>
+<td>41</td>
+<td>40-44</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">79687</th>
+<td>19</td>
+<td>15-19</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">140172</th>
+<td>67</td>
+<td>65-69</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">60599</th>
+<td>40</td>
+<td>40-44</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Estas inconsistencias se originan probablemente por errores de interpretación de formato (por ejemplo, conversión automática a fechas). Sin embargo, al contrastarlas con la variable <code>EDAD_SIMPLE</code>, se observa que corresponden realmente a los rangos <code>10-14</code>, <code>1-4</code> y <code>5-9</code>, respectivamente.</p>
+<p>Por esta razón, se realiza una corrección directa de estos valores en lugar de eliminarlos, conservando así la información de los registros.</p>
+<div id="463fc2fc" class="cell" data-execution_count="553">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"ETAREO_QUIN"</span>] <span class="op">=</span> df[<span class="st">"ETAREO_QUIN"</span>].replace({</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"oct-14"</span>: <span class="st">"10-14"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1-abr"</span>: <span class="st">"1-4"</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"5-sep"</span>: <span class="st">"5-9"</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Adicionalmente, categorías como “Sin información”, “Edad desconocida” y “Mayor de 2 años y sin inf.” se tratan como valores faltantes, ya que no aportan información útil para el análisis.</p>
+<div id="e317ff55" class="cell" data-execution_count="554">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df.loc[df[<span class="st">"ETAREO_QUIN"</span>].isin([</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Sin información"</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Edad desconocida"</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Mayor de 2 años y sin inf."</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>]), <span class="st">"ETAREO_QUIN"</span>] <span class="op">=</span> np.nan</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="00a729cb" class="cell" data-execution_count="555">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"ETAREO_QUIN"</span>].value_counts().sort_index()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="555">
+<pre><code>ETAREO_QUIN
+1-4            385
+10-14          433
+100 y mas     1256
+15-19         1809
+20-24         2841
+25-29         3008
+30-34         3014
+35-39         2901
+40-44         2992
+45-49         4063
+5-9            275
+50-54         6032
+55-59         8546
+60-64        10919
+65-69        12820
+70-74        14462
+75-79        16206
+80-84        17927
+85-89        17052
+90-94        11404
+95-99         4831
+&lt; 1 año       2162
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+<p>Finalmente, la variable presenta una distribución coherente y consistente con la edad numérica, por lo que se considera adecuada para su uso en el análisis exploratorio y visualización.</p>
+</section>
+<section id="tratamiento-de-la-variable-edad_simple" class="level3">
+<h3 class="anchored" data-anchor-id="tratamiento-de-la-variable-edad_simple">Tratamiento de la variable <code>EDAD_SIMPLE</code></h3>
+<div id="b94aa9ff" class="cell" data-execution_count="556">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"EDAD_SIMPLE"</span>] <span class="op">=</span> pd.to_numeric(df[<span class="st">"EDAD_SIMPLE"</span>], errors<span class="op">=</span><span class="st">"coerce"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="0760c686" class="cell" data-execution_count="557">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"EDAD_SIMPLE"</span>].describe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="557">
+<pre><code>count   145,350.00
+mean         69.04
+std          82.94
+min           0.00
+25%          58.00
+50%          73.00
+75%          84.00
+max       8,888.00
+Name: EDAD_SIMPLE, dtype: float64</code></pre>
+</div>
+</div>
+<p>Aunque la variable <code>EDAD_SIMPLE</code> facilita el análisis al estar expresada en años, se identificaron valores atípicos como 8888 y 4000, los cuales corresponden a edades desconocidas. Por esta razón, estos registros se tratan como valores faltantes.</p>
+<div id="c993e77d" class="cell" data-execution_count="558">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"EDAD_SIMPLE"</span>] <span class="op">=</span> pd.to_numeric(df[<span class="st">"EDAD_SIMPLE"</span>], errors<span class="op">=</span><span class="st">"coerce"</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>df.loc[df[<span class="st">"EDAD_SIMPLE"</span>].isin([<span class="dv">8888</span>, <span class="dv">4000</span>, <span class="dv">4999</span>]), <span class="st">"EDAD_SIMPLE"</span>] <span class="op">=</span> np.nan</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"EDAD_SIMPLE"</span>].describe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="558">
+<pre><code>count   145,338.00
+mean         68.31
+std          21.39
+min           0.00
+25%          58.00
+50%          73.00
+75%          84.00
+max         116.00
+Name: EDAD_SIMPLE, dtype: float64</code></pre>
+</div>
+</div>
+<div id="25b19eb6" class="cell" data-execution_count="559">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>faltantes <span class="op">=</span> df[<span class="st">"EDAD_SIMPLE"</span>].isna().<span class="bu">sum</span>()</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Faltantes: </span><span class="sc">{</span>faltantes<span class="sc">}</span><span class="ss"> | Proporción: </span><span class="sc">{</span>faltantes <span class="op">/</span> <span class="bu">len</span>(df) <span class="op">*</span> <span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Faltantes: 39 | Proporción: 0.03%</code></pre>
+</div>
+</div>
+<p>Luego del proceso de limpieza, la variable <code>EDAD_SIMPLE</code> presenta valores coherentes dentro del rango esperado (0 a 120 años), con una baja proporción de datos faltantes (0,02%) y sin presencia de valores atípicos que distorsionen el análisis.</p>
+<p>Dado que <code>EDAD_SIMPLE</code> representa la edad de forma directa y precisa, se mantiene como la variable principal para el análisis de edad dentro del dataset.</p>
+</section>
+<section id="conversión-de-fecha" class="level3">
+<h3 class="anchored" data-anchor-id="conversión-de-fecha">Conversión de fecha</h3>
+<p>La variable <code>FECHA_DEF</code> se encuentra inicialmente en formato de texto, por lo que es necesario convertirla a un formato de tipo fecha (<code>datetime</code>) para facilitar su análisis.</p>
+<p>Esta transformación permite trabajar con la información temporal de manera más adecuada, especialmente para identificar rangos de tiempo, tendencias y posibles patrones en las defunciones.</p>
+<p>Adicionalmente, se realiza una verificación del proceso de conversión, con el fin de asegurar que todas las fechas sean válidas y coherentes con el período del dataset.</p>
+<div id="6d79c91e" class="cell" data-execution_count="560">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"FECHA_DEF"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"FECHA_DEF"</span>], dayfirst<span class="op">=</span><span class="va">True</span>, errors<span class="op">=</span><span class="st">"coerce"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Verificar coherencia con ANO/MES ya presentes en el dataset</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>fecha_ok <span class="op">=</span> df[<span class="st">"FECHA_DEF"</span>].notna().<span class="bu">sum</span>()</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Fechas parseadas correctamente: </span><span class="sc">{</span>fecha_ok<span class="sc">:,}</span><span class="ss"> / </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Rango: </span><span class="sc">{</span>df[<span class="st">'FECHA_DEF'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss"> → </span><span class="sc">{</span>df[<span class="st">'FECHA_DEF'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Fechas parseadas correctamente: 145,377 / 145,377
+Rango: 2012-01-01 → 2021-12-31</code></pre>
+</div>
+</div>
+<p>Los resultados muestran que la totalidad de las fechas fueron convertidas correctamente, con un rango que abarca desde 2012 hasta 2021, lo cual es consistente con la información general del dataset.</p>
+</section>
+<section id="recodificación-de-variables-categóricas" class="level3">
+<h3 class="anchored" data-anchor-id="recodificación-de-variables-categóricas">Recodificación de variables categóricas</h3>
+<p>Recodificación de variables categóricas</p>
+<p>Algunas variables del dataset se encuentran codificadas numéricamente, lo que dificulta su interpretación directa. Por esta razón, se realiza un proceso de recodificación, asignando etiquetas descriptivas a cada categoría.</p>
+<p>Este paso permite facilitar el análisis exploratorio y la construcción de visualizaciones, haciendo más comprensibles los resultados.</p>
+<p>En particular, se recodifican las siguientes variables:</p>
+<ul>
+<li><code>SEXO</code>: se transforma de valores numéricos a categorías como masculino, femenino e indeterminado.</li>
+<li><code>TIPO_DEFUN</code>: permite diferenciar entre defunciones naturales, no naturales y en estudio.</li>
+<li><code>EST_CIVIL</code>: se agrupan algunas categorías similares (como tipos de unión libre) para simplificar el análisis.</li>
+<li><code>SEG_SOCIAL</code>: se traduce a los diferentes regímenes del sistema de salud.</li>
+</ul>
+<p>Adicionalmente, la variable <code>NIVEL_EDU</code> se agrupa en categorías más amplias, con el fin de reducir la granularidad y facilitar la interpretación de los resultados.</p>
+<div id="b0f35218" class="cell" data-execution_count="561">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SEXO</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"SEXO"</span>] <span class="op">=</span> df[<span class="st">"SEXO"</span>].<span class="bu">map</span>({<span class="dv">1</span>: <span class="st">"Masculino"</span>, <span class="dv">2</span>: <span class="st">"Femenino"</span>, <span class="dv">3</span>: <span class="st">"Indeterminado"</span>}).fillna(<span class="st">"Sin info"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># TIPO_DEFUN</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"TIPO_DEFUN"</span>] <span class="op">=</span> df[<span class="st">"TIPO_DEFUN"</span>].<span class="bu">map</span>({<span class="dv">1</span>: <span class="st">"Fetal"</span>, <span class="dv">2</span>: <span class="st">"No fetal"</span>}).fillna(<span class="st">"Sin info"</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># EST_CIVIL (codificación original: 1=UL estable, 2=UL reciente, 3=Sep/Div, 4=Viudo, 5=Soltero, 6=Casado, 9=Sin info)</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>est_map <span class="op">=</span> {<span class="dv">1</span>: <span class="st">"Unión libre"</span>, <span class="dv">2</span>: <span class="st">"Unión libre"</span>, <span class="dv">3</span>: <span class="st">"Separado/a"</span>,</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>           <span class="dv">4</span>: <span class="st">"Viudo/a"</span>, <span class="dv">5</span>: <span class="st">"Soltero/a"</span>, <span class="dv">6</span>: <span class="st">"Casado/a"</span>, <span class="dv">9</span>: <span class="st">"Sin info"</span>}</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"EST_CIVIL"</span>] <span class="op">=</span> df[<span class="st">"EST_CIVIL"</span>].<span class="bu">map</span>(est_map).fillna(<span class="st">"Sin info"</span>)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co"># SEG_SOCIAL</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>seg_map <span class="op">=</span> {<span class="dv">1</span>: <span class="st">"Contributivo"</span>, <span class="dv">2</span>: <span class="st">"Subsidiado"</span>, <span class="dv">3</span>: <span class="st">"Vinculado"</span>,</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>           <span class="dv">4</span>: <span class="st">"Particular"</span>, <span class="dv">5</span>: <span class="st">"Excepción"</span>, <span class="dv">6</span>: <span class="st">"Indígena"</span>}</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"SEG_SOCIAL"</span>] <span class="op">=</span> df[<span class="st">"SEG_SOCIAL"</span>].<span class="bu">map</span>(seg_map).fillna(<span class="st">"Sin info"</span>)</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="co"># NIVEL_EDU — agrupado en niveles relevantes para análisis</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> agrupar_nivel_educativo(x):</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> x <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>]: <span class="cf">return</span> <span class="st">"Básica"</span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> x <span class="kw">in</span> [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>]: <span class="cf">return</span> <span class="st">"Media"</span></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> x <span class="kw">in</span> [<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>]: <span class="cf">return</span> <span class="st">"Técnico/Tecnológico"</span></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> x <span class="kw">in</span> [<span class="dv">9</span>, <span class="dv">10</span>, <span class="dv">11</span>, <span class="dv">12</span>]: <span class="cf">return</span> <span class="st">"Superior"</span></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: <span class="cf">return</span> <span class="st">"Sin info"</span></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"NIVEL_EDU_GRUPO"</span>] <span class="op">=</span> df[<span class="st">"NIVEL_EDU"</span>].<span class="bu">apply</span>(agrupar_nivel_educativo)</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Recodificaciones completadas."</span>)</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Distribución SEXO:"</span>)</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"SEXO"</span>].value_counts())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Recodificaciones completadas.
+
+Distribución SEXO:
+SEXO
+Masculino        76224
+Femenino         69150
+Indeterminado        3
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+</section>
+<section id="limpieza-de-la-variable-objetivo" class="level3">
+<h3 class="anchored" data-anchor-id="limpieza-de-la-variable-objetivo">Limpieza de la variable objetivo</h3>
+<p>La variable <code>NOM_667_OPS_GRUPO</code> corresponde a la clasificación de la causa de muerte y es el eje central del análisis.</p>
+<div id="23ca66e0" class="cell" data-execution_count="562">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limpieza básica de texto</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"NOM_667_OPS_GRUPO"</span>] <span class="op">=</span> df[<span class="st">"NOM_667_OPS_GRUPO"</span>].<span class="bu">str</span>.strip()</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"NOM_667_OPS_GRUPO"</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>NOM_667_OPS_GRUPO
+Enfermedades del sistema circulatorio                    41337
+Neoplasias (Tumores)                                     34857
+Todas las demas enfermedades                             33785
+Enfermedades Transmisibles                               19070
+Causas externas                                          14462
+Ciertas afecciones originadas en el periodo perinatal     1121
+Signos sintomas y afecciones mal definidas                 519
+Signos, sintomas y afecciones mal definidas                226
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+<p>Al revisar sus valores, no se identificaron datos faltantes ni registros sin información. Sin embargo, se detectaron inconsistencias en la escritura de algunas categorías, específicamente diferencias en el uso de signos de puntuación.</p>
+<p>Para corregir esto, se realiza una limpieza básica del texto, eliminando caracteres como comas y espacios innecesarios, con el fin de unificar categorías equivalentes.</p>
+<div id="b0da8924" class="cell" data-execution_count="563">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Unificar categorías inconsistentes</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"NOM_667_OPS_GRUPO"</span>] <span class="op">=</span> df[<span class="st">"NOM_667_OPS_GRUPO"</span>].<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">""</span>, regex<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verificación</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"NOM_667_OPS_GRUPO"</span>].value_counts())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>NOM_667_OPS_GRUPO
+Enfermedades del sistema circulatorio                    41337
+Neoplasias (Tumores)                                     34857
+Todas las demas enfermedades                             33785
+Enfermedades Transmisibles                               19070
+Causas externas                                          14462
+Ciertas afecciones originadas en el periodo perinatal     1121
+Signos sintomas y afecciones mal definidas                 745
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+</section>
+<section id="ajustes-finales-del-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="ajustes-finales-del-dataset">Ajustes finales del dataset</h3>
+<div id="a12a201d" class="cell" data-execution_count="564">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Partimos del dataset ya trabajado</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>df_clean <span class="op">=</span> df.copy()</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Eliminar variable sin variabilidad</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>df_clean.drop(columns<span class="op">=</span>[<span class="st">"TIPO_DEFUN"</span>], inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Verificación rápida</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset final: </span><span class="sc">{</span>df_clean<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">:,}</span><span class="ss"> registros × </span><span class="sc">{</span>df_clean<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> variables"</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Columnas:"</span>)</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_clean.columns.tolist())</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Verificación de nulos:"</span>)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>((df_clean.isna().mean()<span class="op">*</span><span class="dv">100</span>).<span class="bu">round</span>(<span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset final: 145,377 registros × 14 variables
+
+Columnas:
+['FECHA_DEF', 'ANO', 'MES', 'SEXO', 'EST_CIVIL', 'NIVEL_EDU', 'CODMUNRE', 'SEG_SOCIAL', 'BARRIO_RES', 'COMUNA_RES', 'ETAREO_QUIN', 'EDAD_SIMPLE', 'NOM_667_OPS_GRUPO', 'NIVEL_EDU_GRUPO']
+
+Verificación de nulos:
+FECHA_DEF           0.00
+ANO                 0.00
+MES                 0.00
+SEXO                0.00
+EST_CIVIL           0.00
+NIVEL_EDU           0.00
+CODMUNRE            0.00
+SEG_SOCIAL          0.00
+BARRIO_RES          0.00
+COMUNA_RES          0.00
+ETAREO_QUIN         0.03
+EDAD_SIMPLE         0.03
+NOM_667_OPS_GRUPO   0.00
+NIVEL_EDU_GRUPO     0.00
+dtype: float64</code></pre>
+</div>
+</div>
+<p>Una vez realizadas las transformaciones y limpieza de las variables, se procede a una revisión final del conjunto de datos con el fin de asegurar su coherencia antes del análisis exploratorio.</p>
+<p>En este paso, se identifica que la variable <code>TIPO_DEFUN</code> presenta un único valor en todos los registros (defunciones no fetales), por lo que no aporta información relevante para el análisis. Debido a esto, se decide eliminarla del dataset, ya que no permite establecer comparaciones ni identificar patrones.</p>
+<p>Adicionalmente, se verifica la ausencia de valores faltantes en las variables seleccionadas, lo que permite trabajar con un conjunto de datos completo y consistente.</p>
+<p>Como resultado, se obtiene un dataset limpio, con variables relevantes y listo para el análisis exploratorio.</p>
+<hr>
+</section>
+</section>
+<section id="análisis-univariado" class="level2">
+<h2 class="anchored" data-anchor-id="análisis-univariado">Análisis univariado</h2>
+<section id="grupo-ops" class="level3">
+<h3 class="anchored" data-anchor-id="grupo-ops">Grupo OPS</h3>
+<p>Se inicia el análisis exploratorio estudiando la distribución de la variable objetivo <code>NOM_667_OPS_GRUPO</code>, ya que esta permite identificar cuáles son las principales causas de muerte en el dataset.</p>
+<p>Este análisis es importante porque: - Permite detectar si existen clases dominantes - Ayuda a entender el comportamiento general de la mortalidad - Sirve como base para los análisis posteriores</p>
+<div id="51f08c78" class="cell" data-execution_count="565">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">5</span>))</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>vo_counts <span class="op">=</span> df_clean[<span class="st">"NOM_667_OPS_GRUPO"</span>].value_counts()</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>vo_pct    <span class="op">=</span> (vo_counts <span class="op">/</span> <span class="bu">len</span>(df_clean) <span class="op">*</span> <span class="dv">100</span>).<span class="bu">round</span>(<span class="dv">1</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico de barras</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].barh(vo_counts.index, vo_counts.values)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (v, p) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(vo_counts.values, vo_pct.values)):</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">0</span>].text(v <span class="op">+</span> <span class="dv">200</span>, i, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:,}</span><span class="ss"> (</span><span class="sc">{</span>p<span class="sc">}</span><span class="ss">%)"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Defunciones"</span>)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Distribución por Grupo de causa de muerte"</span>)</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].invert_yaxis()</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Evolución temporal (top 5)</span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>top5 <span class="op">=</span> vo_counts.head(<span class="dv">5</span>).index</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>df_top5 <span class="op">=</span> df_clean[df_clean[<span class="st">"NOM_667_OPS_GRUPO"</span>].isin(top5)]</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>evol <span class="op">=</span> df_top5.groupby([<span class="st">"ANO"</span>, <span class="st">"NOM_667_OPS_GRUPO"</span>]).size().unstack(fill_value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> evol.columns:</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">1</span>].plot(evol.index, evol[col], marker<span class="op">=</span><span class="st">"o"</span>, label<span class="op">=</span>col)</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Evolución anual de las principales causas"</span>)</span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"Año"</span>)</span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Número de defunciones"</span>)</span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-22-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>A partir de la distribución de la variable objetivo, se observa que:</p>
+<ul>
+<li><p>Las principales causas de muerte corresponden a:</p>
+<ul>
+<li>Enfermedades del sistema circulatorio (~28%)</li>
+<li>Neoplasias (tumores) (~24%)</li>
+<li>Otras enfermedades (~23%)</li>
+</ul></li>
+<li><p>Estas tres categorías concentran aproximadamente el 75% de las defunciones, lo que indica una alta concentración en causas crónicas no transmisibles.</p></li>
+<li><p>Las enfermedades transmisibles representan una menor proporción (~13%), mientras que las causas externas (accidentes, violencia, etc.) tienen una participación cercana al 10%.</p></li>
+<li><p>Las categorías menos frecuentes, como afecciones perinatales o causas mal definidas, tienen una presencia marginal en el dataset.</p></li>
+</ul>
+<p>En cuanto a la evolución temporal:</p>
+<ul>
+<li>Las enfermedades del sistema circulatorio muestran un leve aumento progresivo con cada periodo, reflejando una tendencia ascendente en este tipo de afecciones a lo largo de los años.</li>
+<li>En 2019, se observa un pico abismal notable en las enfermedades transmisibles, especialmente a raíz de la pandemia de COVID-19, lo que genera una alteración significativa en el patrón de mortalidad.</li>
+<li>Las principales causas de muerte muestran, en general, una tendencia estable, aunque con variaciones notables durante los años de impacto pandémico.</li>
+</ul>
+<p>En general, estos resultados son consistentes con lo esperado en poblaciones urbanas, donde predominan las enfermedades crónicas, aunque con un cambio relevante en las enfermedades infecciosas debido a la crisis sanitaria global.</p>
+</section>
+<section id="sexo" class="level3">
+<h3 class="anchored" data-anchor-id="sexo">Sexo</h3>
+<div id="35e9013f" class="cell" data-execution_count="566">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>sexo_counts <span class="op">=</span> df_clean[<span class="st">"SEXO"</span>].value_counts()</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>sexo_pct <span class="op">=</span> (sexo_counts <span class="op">/</span> <span class="bu">len</span>(df_clean) <span class="op">*</span> <span class="dv">100</span>).<span class="bu">round</span>(<span class="dv">1</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">4</span>))</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>sexo_counts.plot(kind<span class="op">=</span><span class="st">"bar"</span>)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Distribución por sexo"</span>)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Sexo"</span>)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Frecuencia"</span>)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame({</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Frecuencia"</span>: sexo_counts,</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"%"</span>: sexo_pct</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>}))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-23-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Frecuencia     %
+SEXO                           
+Masculino           76224 52.40
+Femenino            69150 47.60
+Indeterminado           3  0.00</code></pre>
+</div>
+</div>
+<p>La variable <code>SEXO</code> presenta una distribución relativamente equilibrada:</p>
+<ul>
+<li>Masculino: ~52%</li>
+<li>Femenino: ~48%</li>
+<li>Indeterminado: casos mínimos</li>
+</ul>
+<p>Esto indica que no existe un sesgo fuerte en la variable, lo cual es positivo para el análisis, ya que permite comparaciones más equilibradas entre ambos grupos.</p>
+<p>Además, la baja presencia de valores indeterminados sugiere una buena calidad en el registro de esta variable.</p>
+</section>
+<section id="edad" class="level3">
+<h3 class="anchored" data-anchor-id="edad">Edad</h3>
+<div id="1afc21ff" class="cell" data-execution_count="567">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>,<span class="dv">4</span>))</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>plt.hist(df_clean[<span class="st">"EDAD_SIMPLE"</span>], bins<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Distribución de la edad"</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Edad"</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Frecuencia"</span>)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_clean[<span class="st">"EDAD_SIMPLE"</span>].describe().<span class="bu">round</span>(<span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-24-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>count   145,338.00
+mean         68.30
+std          21.40
+min           0.00
+25%          58.00
+50%          73.00
+75%          84.00
+max         116.00
+Name: EDAD_SIMPLE, dtype: float64</code></pre>
+</div>
+</div>
+<p>La variable <code>EDAD_SIMPLE</code> presenta una distribución coherente con el fenómeno estudiado:</p>
+<ul>
+<li>La edad promedio es de aproximadamente 68 años</li>
+<li>La mediana se ubica en 73 años, lo que indica una concentración de defunciones en edades adultas mayores</li>
+<li>El 50% de los casos se encuentra entre los 58 y 84 años (rango intercuartílico)</li>
+<li>La edad máxima observada es de 116 años, dentro de los límites esperados del dataset</li>
+</ul>
+<p>En general, la distribución muestra que la mayor parte de las defunciones ocurre en población de edad avanzada, lo cual es consistente con patrones demográficos habituales.</p>
+<p>Adicionalmente, se observan edades cercanas a 0 años, asociadas a mortalidad en etapas tempranas de la vida, aunque representan una proporción menor dentro del total de registros.</p>
+</section>
+</section>
+<section id="análisis-bivariado-nom_667_ops_grupo-vs-variables-relevantes" class="level2">
+<h2 class="anchored" data-anchor-id="análisis-bivariado-nom_667_ops_grupo-vs-variables-relevantes">Análisis bivariado: <code>NOM_667_OPS_GRUPO</code> vs variables relevantes</h2>
+<p>El objetivo es identificar posibles patrones o diferencias en las causas de muerte según características demográficas, sociales y temporales, lo cual permite enriquecer la interpretación de los datos más allá del análisis individual de cada variable.</p>
+<section id="grupo-ops-sexo" class="level3">
+<h3 class="anchored" data-anchor-id="grupo-ops-sexo">5.1 Grupo OPS × Sexo</h3>
+<div id="fd1c3bd9" class="cell" data-execution_count="568">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabla de proporciones</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>ct_sexo <span class="op">=</span> pd.crosstab(</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    df_clean[<span class="st">"NOM_667_OPS_GRUPO"</span>],</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    df_clean[<span class="st">"SEXO"</span>],</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    normalize<span class="op">=</span><span class="st">"index"</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>ct_sexo_counts <span class="op">=</span> pd.crosstab(</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    df_clean[<span class="st">"NOM_667_OPS_GRUPO"</span>],</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    df_clean[<span class="st">"SEXO"</span>]</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">6</span>))</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.arange(<span class="bu">len</span>(ct_sexo))</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>width <span class="op">=</span> <span class="fl">0.35</span></span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>bars_m <span class="op">=</span> ax.bar(x, ct_sexo[<span class="st">"Masculino"</span>], width, label<span class="op">=</span><span class="st">"Masculino"</span>, color<span class="op">=</span><span class="st">"#1565C0"</span>)</span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>bars_f <span class="op">=</span> ax.bar(x <span class="op">+</span> width, ct_sexo[<span class="st">"Femenino"</span>], width, label<span class="op">=</span><span class="st">"Femenino"</span>, color<span class="op">=</span><span class="st">"#C2185B"</span>)</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Etiquetas</span></span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(x <span class="op">+</span> width <span class="op">/</span> <span class="dv">2</span>)</span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels(ct_sexo.index, rotation<span class="op">=</span><span class="dv">30</span>, ha<span class="op">=</span><span class="st">"right"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Porcentaje (%)"</span>)</span>
+<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Distribución por sexo dentro de cada grupo de causa de muerte"</span>)</span>
+<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Conteos absolutos:"</span>)</span>
+<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ct_sexo_counts)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-25-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Conteos absolutos:
+SEXO                                                Femenino  Indeterminado  \
+NOM_667_OPS_GRUPO                                                             
+Causas externas                                         2383              1   
+Ciertas afecciones originadas en el periodo per...       469              0   
+Enfermedades Transmisibles                              8190              0   
+Enfermedades del sistema circulatorio                  20935              0   
+Neoplasias (Tumores)                                   18489              0   
+Signos sintomas y afecciones mal definidas               314              1   
+Todas las demas enfermedades                           18370              1   
+
+SEXO                                                Masculino  
+NOM_667_OPS_GRUPO                                              
+Causas externas                                         12078  
+Ciertas afecciones originadas en el periodo per...        652  
+Enfermedades Transmisibles                              10880  
+Enfermedades del sistema circulatorio                   20402  
+Neoplasias (Tumores)                                    16368  
+Signos sintomas y afecciones mal definidas                430  
+Todas las demas enfermedades                            15414  </code></pre>
+</div>
+</div>
+<p>A partir del cruce entre el grupo de causa de muerte y el sexo, se observan diferencias importantes:</p>
+<ul>
+<li><p>En <strong>causas externas</strong>, la proporción de hombres es considerablemente mayor que la de mujeres. Esto puede estar relacionado con una mayor exposición de la población masculina a situaciones de riesgo como accidentes o violencia.</p></li>
+<li><p>En <strong>enfermedades transmisibles</strong>, también se observa una mayor participación de hombres, aunque la diferencia no es tan marcada como en causas externas.</p></li>
+<li><p>En <strong>enfermedades del sistema circulatorio</strong> y <strong>neoplasias</strong>, la distribución entre hombres y mujeres es más equilibrada, lo que sugiere que estas causas afectan de manera similar a ambos sexos.</p></li>
+<li><p>En general, la variable sexo sí muestra diferencias relevantes dependiendo del tipo de causa de muerte, por lo que resulta útil para el análisis y para futuras visualizaciones en el dashboard.</p></li>
+</ul>
+<p>Estos resultados permiten identificar patrones diferenciados por sexo que pueden ser útiles en el análisis de salud pública.</p>
+</section>
+<section id="grupo-ops-grupo-etario" class="level3">
+<h3 class="anchored" data-anchor-id="grupo-ops-grupo-etario">5.2 Grupo OPS × Grupo etario</h3>
+<div id="7eae57e2" class="cell" data-execution_count="569">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ¿Qué edades concentra cada causa de muerte?</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>df_edad_ops <span class="op">=</span> df_clean[</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    df_clean[<span class="st">"ETAREO_QUIN"</span>].notna() <span class="op">&amp;</span> </span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">~</span>df_clean[<span class="st">"ETAREO_QUIN"</span>].isin([<span class="st">"Sin informacion"</span>, <span class="st">"sin informacion"</span>])</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>].copy()</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>heatmap_data <span class="op">=</span> pd.crosstab(</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>    df_edad_ops[<span class="st">"NOM_667_OPS_GRUPO"</span>],</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>    df_edad_ops[<span class="st">"ETAREO_QUIN"</span>],</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>    normalize<span class="op">=</span><span class="st">"index"</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>).<span class="bu">round</span>(<span class="dv">3</span>) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Ordenar columnas etarias si es posible</span></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>heatmap_data <span class="op">=</span> heatmap_data.sort_index(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">6</span>))</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> ax.imshow(heatmap_data.values, aspect<span class="op">=</span><span class="st">"auto"</span>, cmap<span class="op">=</span><span class="st">"YlOrRd"</span>)</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>plt.colorbar(im, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"</span><span class="sc">% d</span><span class="st">entro del grupo OPS"</span>)</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(heatmap_data.columns)))</span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels(heatmap_data.columns, rotation<span class="op">=</span><span class="dv">45</span>, ha<span class="op">=</span><span class="st">"right"</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(<span class="bu">range</span>(<span class="bu">len</span>(heatmap_data.index)))</span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels(heatmap_data.index, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Heatmap: Grupo OPS × Grupo Etario (% por fila)"</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>A partir del mapa de calor, se pueden identificar varios patrones relevantes:</p>
+<ul>
+<li><p>En el grupo de <strong>menores de 1 año</strong>, la totalidad de los casos se concentra en <strong>afecciones originadas en el periodo perinatal</strong>, lo cual es consistente con la naturaleza de este tipo de causas.</p></li>
+<li><p>En los grupos de edad entre <strong>15 y 49 años</strong>, se observa un leve aumento en la proporción de <strong>causas externas</strong>, lo que sugiere una mayor incidencia de muertes asociadas a accidentes o violencia en población joven y adulta.</p></li>
+<li><p>A partir de los <strong>50 años y hasta aproximadamente los 94 años</strong>, se evidencia una mayor concentración de defunciones en la mayoría de los grupos de causas, especialmente en enfermedades crónicas. Esto indica que la mortalidad en edades avanzadas está más asociada a enfermedades del sistema circulatorio, neoplasias y otras condiciones de salud.</p></li>
+<li><p>En general, fuera de estos patrones específicos, la distribución de los grupos etarios dentro de cada causa de muerte no presenta concentraciones extremadamente altas (en su mayoría por debajo del 30%), lo que indica que muchas causas afectan a distintos grupos de edad, aunque con mayor intensidad en edades adultas mayores.</p></li>
+</ul>
+<p>En conjunto, estos resultados muestran que la edad es un factor clave en la distribución de las causas de muerte, diferenciando claramente entre mortalidad temprana, causas externas en población joven y enfermedades crónicas en edades avanzadas.</p>
+</section>
+<section id="grupo-ops-año" class="level3">
+<h3 class="anchored" data-anchor-id="grupo-ops-año">Grupo OPS × Año</h3>
+<div id="ae43f7ff" class="cell" data-execution_count="570">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>evol_ops <span class="op">=</span> df_clean.groupby([<span class="st">"ANO"</span>, <span class="st">"NOM_667_OPS_GRUPO"</span>]).size().unstack(fill_value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>evol_ops_pct <span class="op">=</span> evol_ops.div(evol_ops.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>), axis<span class="op">=</span><span class="dv">0</span>) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">9</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Evolución absoluta</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> evol_ops.columns:</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    ax1.plot(evol_ops.index, evol_ops[col], marker<span class="op">=</span><span class="st">"o"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span>col)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>ax1.set_ylabel(<span class="st">"Número de defunciones"</span>)</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">"Evolución de defunciones por grupo de causa"</span>)</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>ax1.legend(fontsize<span class="op">=</span><span class="dv">7</span>, bbox_to_anchor<span class="op">=</span>(<span class="fl">1.01</span>, <span class="dv">1</span>), loc<span class="op">=</span><span class="st">"upper left"</span>)</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Evolución proporcional</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>ax2.stackplot(evol_ops_pct.index, evol_ops_pct.T.values, labels<span class="op">=</span>evol_ops_pct.columns, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>ax2.set_ylabel(<span class="st">"Porcentaje (%)"</span>)</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>ax2.set_xlabel(<span class="st">"Año"</span>)</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">"Composición porcentual de las causas de muerte por año"</span>)</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>ax2.set_ylim(<span class="dv">0</span>, <span class="dv">100</span>)</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>ax2.legend(fontsize<span class="op">=</span><span class="dv">7</span>, bbox_to_anchor<span class="op">=</span>(<span class="fl">1.01</span>, <span class="dv">1</span>), loc<span class="op">=</span><span class="st">"upper left"</span>)</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>En la evolución temporal de las causas de muerte se observan patrones importantes:</p>
+<ul>
+<li><p>En términos absolutos, las principales causas de muerte mantienen una tendencia relativamente estable a lo largo del tiempo, sin cambios drásticos en la mayoría de los grupos.</p></li>
+<li><p>Sin embargo, se destaca un aumento notable alrededor del año 2019 en el grupo de <strong>enfermedades transmisibles</strong>, lo cual podría estar asociado a eventos específicos que incrementaron este tipo de defunciones.</p></li>
+<li><p>En la composición porcentual, las <strong>enfermedades transmisibles</strong> muestran un incremento marcado en ese mismo periodo, evidenciando un cambio temporal en la estructura de las causas de muerte.</p></li>
+<li><p>De forma general, también se observa un leve aumento en la participación de otros grupos de causas, mientras que las <strong>causas externas</strong> presentan una ligera disminución en su proporción relativa.</p></li>
+<li><p>A pesar de estas variaciones, las enfermedades del sistema circulatorio y las neoplasias continúan representando una parte importante del total de defunciones a lo largo de todos los años.</p></li>
+</ul>
+<p>En conjunto, estos resultados indican que, aunque la estructura general de la mortalidad se mantiene relativamente estable, existen cambios puntuales en el tiempo que pueden ser relevantes para el análisis.</p>
+</section>
+<section id="grupo-ops-régimen-de-seguridad-social" class="level3">
+<h3 class="anchored" data-anchor-id="grupo-ops-régimen-de-seguridad-social">Grupo OPS × Régimen de seguridad social</h3>
+<div id="d436bd61" class="cell" data-execution_count="571">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>df_seg <span class="op">=</span> df_clean[df_clean[<span class="st">"SEG_SOCIAL"</span>] <span class="op">!=</span> <span class="st">"Sin info"</span>].copy()</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>ct_seg <span class="op">=</span> pd.crosstab(</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    df_seg[<span class="st">"NOM_667_OPS_GRUPO"</span>],</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    df_seg[<span class="st">"SEG_SOCIAL"</span>],</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    normalize<span class="op">=</span><span class="st">"index"</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">6</span>))</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> ax.imshow(ct_seg.values, aspect<span class="op">=</span><span class="st">"auto"</span>, cmap<span class="op">=</span><span class="st">"Blues"</span>)</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>plt.colorbar(im, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"Porcentaje (%)"</span>)</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(ct_seg.columns)))</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels(ct_seg.columns, rotation<span class="op">=</span><span class="dv">30</span>, ha<span class="op">=</span><span class="st">"right"</span>)</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(<span class="bu">range</span>(<span class="bu">len</span>(ct_seg.index)))</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels(ct_seg.index, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Distribución por régimen de seguridad social en cada causa de muerte"</span>,fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-28-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>El análisis muestra una fuerte concentración de los casos en el régimen contributivo:</p>
+<ul>
+<li><p>En todos los grupos de causas de muerte, el <strong>régimen contributivo</strong> presenta la mayor proporción, alcanzando valores cercanos al 60%, lo que indica que la mayoría de los registros corresponde a población afiliada a este régimen.</p></li>
+<li><p>El <strong>régimen subsidiado</strong> también tiene una participación importante, aunque menor, ubicándose aproximadamente entre el 30% y 40% según el grupo de causa de muerte.</p></li>
+<li><p>El régimen de <strong>excepción</strong> presenta una proporción baja, generalmente entre el 10% y 15%, con una presencia mucho menor en comparación con los dos principales regímenes.</p></li>
+<li><p>Por otro lado, los regímenes <strong>particular</strong> y <strong>vinculado</strong> prácticamente no tienen representación en los datos, lo que sugiere que su impacto en este dataset es mínimo.</p></li>
+</ul>
+<p>En general, no se observan diferencias marcadas entre los grupos de causas de muerte en función del régimen de seguridad social, sino más bien una distribución bastante homogénea dominada por el régimen contributivo.</p>
+<p>Esto sugiere que, en este caso, el régimen de afiliación no parece ser un factor determinante fuerte en la diferenciación de las causas de muerte.</p>
+</section>
+<section id="grupo-ops-nivel-educativo" class="level3">
+<h3 class="anchored" data-anchor-id="grupo-ops-nivel-educativo">Grupo OPS × Nivel educativo</h3>
+<div id="ce7316cf" class="cell" data-execution_count="572">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>df_edu <span class="op">=</span> df_clean[<span class="op">~</span>df_clean[<span class="st">"NIVEL_EDU_GRUPO"</span>].isin([<span class="st">"Sin info"</span>])].copy()</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>ct_edu <span class="op">=</span> pd.crosstab(df_edu[<span class="st">"NOM_667_OPS_GRUPO"</span>], df_edu[<span class="st">"NIVEL_EDU_GRUPO"</span>], normalize<span class="op">=</span><span class="st">"index"</span>).<span class="bu">round</span>(<span class="dv">3</span>)<span class="op">*</span><span class="dv">100</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>orden_edu <span class="op">=</span> [<span class="st">"Básica"</span>, <span class="st">"Media"</span>, <span class="st">"Técnico/Tecnológico"</span>, <span class="st">"Superior"</span>]</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>ct_edu <span class="op">=</span> ct_edu[[c <span class="cf">for</span> c <span class="kw">in</span> orden_edu <span class="cf">if</span> c <span class="kw">in</span> ct_edu.columns]]</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>ct_edu.plot(kind<span class="op">=</span><span class="st">"barh"</span>, ax<span class="op">=</span>ax, stacked<span class="op">=</span><span class="va">True</span>, colormap<span class="op">=</span><span class="st">"RdYlGn"</span>, alpha<span class="op">=</span><span class="fl">0.85</span>)</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"</span><span class="sc">% d</span><span class="st">entro del grupo OPS"</span>)</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Composición por nivel educativo — Grupo OPS"</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>ax.legend(loc<span class="op">=</span><span class="st">"lower right"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-29-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="8badcb72" class="cell" data-execution_count="573">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ver tabla ordenada </span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Distribución porcentual por nivel educativo:"</span>)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ct_edu.<span class="bu">round</span>(<span class="dv">1</span>).to_string())</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Ver dominante por grupo OPS</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>dominante <span class="op">=</span> ct_edu.idxmax(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Nivel educativo dominante por grupo OPS:"</span>)</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dominante)</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Ver proporciones máximas</span></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>max_vals <span class="op">=</span> ct_edu.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">1</span>).<span class="bu">round</span>(<span class="dv">1</span>)</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Porcentaje del nivel educativo dominante:"</span>)</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(max_vals)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Distribución porcentual por nivel educativo:
+NIVEL_EDU_GRUPO                                        Básica  Media  Técnico/Tecnológico  Superior
+NOM_667_OPS_GRUPO                                                                                  
+Causas externas                                         33.30  51.40                 6.60      8.80
+Ciertas afecciones originadas en el periodo perinatal  100.00   0.00                 0.00      0.00
+Enfermedades Transmisibles                              57.50  29.90                 4.00      8.50
+Enfermedades del sistema circulatorio                   70.30  20.50                 2.80      6.40
+Neoplasias (Tumores)                                    61.00  25.70                 4.00      9.30
+Signos sintomas y afecciones mal definidas              50.90  33.30                 3.50     12.30
+Todas las demas enfermedades                            69.40  21.30                 2.90      6.30
+
+Nivel educativo dominante por grupo OPS:
+NOM_667_OPS_GRUPO
+Causas externas                                           Media
+Ciertas afecciones originadas en el periodo perinatal    Básica
+Enfermedades Transmisibles                               Básica
+Enfermedades del sistema circulatorio                    Básica
+Neoplasias (Tumores)                                     Básica
+Signos sintomas y afecciones mal definidas               Básica
+Todas las demas enfermedades                             Básica
+dtype: object
+
+Porcentaje del nivel educativo dominante:
+NOM_667_OPS_GRUPO
+Causas externas                                          51.40
+Ciertas afecciones originadas en el periodo perinatal   100.00
+Enfermedades Transmisibles                               57.50
+Enfermedades del sistema circulatorio                    70.30
+Neoplasias (Tumores)                                     61.00
+Signos sintomas y afecciones mal definidas               50.90
+Todas las demas enfermedades                             69.40
+dtype: float64</code></pre>
+</div>
+</div>
+<p>En la relación entre el grupo de causas de muerte y el nivel educativo, se observa un patrón general claro.</p>
+<p>En la mayoría de los grupos OPS predomina el nivel educativo básico, lo que indica que una gran parte de las defunciones se concentra en personas con menor nivel de formación. Este patrón es especialmente marcado en enfermedades del sistema circulatorio y otras enfermedades, donde supera el 65%.</p>
+<p>Sin embargo, en el caso de las causas externas, se observa un comportamiento diferente, ya que el nivel educativo medio es el más frecuente, lo que sugiere un perfil distinto para este tipo de eventos.</p>
+<p>Los niveles técnico/tecnológico y superior tienen una participación menor en todos los grupos, sin diferencias muy marcadas entre causas.</p>
+<p>En general, el nivel educativo permite caracterizar el contexto socioeconómico de la población, aunque no actúa como un factor fuertemente diferenciador entre la mayoría de los grupos de causas de muerte.</p>
+</section>
+<section id="grupo-ops-comuna-de-residencia" class="level3">
+<h3 class="anchored" data-anchor-id="grupo-ops-comuna-de-residencia">Grupo OPS × Comuna de residencia</h3>
+<div id="ab2f3127" class="cell" data-execution_count="574">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Top 10 comunas vs distribución de causas</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>df_com <span class="op">=</span> df_clean[<span class="op">~</span>df_clean[<span class="st">"COMUNA_RES"</span>].isin([<span class="st">"Sin informacion"</span>, <span class="st">"sin informacion"</span>, np.nan])].dropna(subset<span class="op">=</span>[<span class="st">"COMUNA_RES"</span>])</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>top10_comunas <span class="op">=</span> df_com[<span class="st">"COMUNA_RES"</span>].value_counts().head(<span class="dv">10</span>).index</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>df_top_com <span class="op">=</span> df_com[df_com[<span class="st">"COMUNA_RES"</span>].isin(top10_comunas)]</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>ct_com <span class="op">=</span> pd.crosstab(df_top_com[<span class="st">"COMUNA_RES"</span>], df_top_com[<span class="st">"NOM_667_OPS_GRUPO"</span>], normalize<span class="op">=</span><span class="st">"index"</span>).<span class="bu">round</span>(<span class="dv">3</span>)<span class="op">*</span><span class="dv">100</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">7</span>))</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> ax.imshow(ct_com.values, aspect<span class="op">=</span><span class="st">"auto"</span>, cmap<span class="op">=</span><span class="st">"YlGnBu"</span>)</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>plt.colorbar(im, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"</span><span class="sc">% d</span><span class="st">entro de la comuna"</span>)</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(ct_com.columns)))</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels(ct_com.columns, rotation<span class="op">=</span><span class="dv">40</span>, ha<span class="op">=</span><span class="st">"right"</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(<span class="bu">range</span>(<span class="bu">len</span>(ct_com.index)))</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels(ct_com.index)</span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Heatmap: Distribución de Grupos OPS por Comuna (Top 10)"</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-31-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="2264f2cc" class="cell" data-execution_count="575">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabla</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Distribución porcentual por comuna (Top 10):"</span>)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ct_com.<span class="bu">round</span>(<span class="dv">1</span>).to_string())</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Grupo OPS dominante por comuna</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>dominante_com <span class="op">=</span> ct_com.idxmax(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Grupo OPS dominante por comuna:"</span>)</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dominante_com)</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Qué tan dominante es</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>max_vals_com <span class="op">=</span> ct_com.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">1</span>).<span class="bu">round</span>(<span class="dv">1</span>)</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Porcentaje del grupo dominante por comuna:"</span>)</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(max_vals_com)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Distribución porcentual por comuna (Top 10):
+NOM_667_OPS_GRUPO   Causas externas  Ciertas afecciones originadas en el periodo perinatal  Enfermedades Transmisibles  Enfermedades del sistema circulatorio  Neoplasias (Tumores)  Signos sintomas y afecciones mal definidas  Todas las demas enfermedades
+COMUNA_RES                                                                                                                                                                                                                                                   
+03 Manrique                    8.90                                                   1.20                       13.50                                  28.80                 22.90                                        0.50                         24.10
+04 Aranjuez                    8.50                                                   0.80                       12.90                                  29.40                 24.30                                        0.40                         23.70
+06 Doce De Octubre             9.10                                                   0.70                       12.20                                  29.30                 24.20                                        0.40                         23.90
+07 Robledo                    11.20                                                   0.90                       13.40                                  26.30                 25.90                                        0.50                         21.70
+08 Villa Hermosa              10.10                                                   1.00                       13.10                                  28.60                 23.40                                        0.60                         23.10
+09 Buenos Aires                8.70                                                   0.70                       13.30                                  28.30                 25.20                                        0.40                         23.40
+10 La Candelaria               8.30                                                   0.40                       14.90                                  32.00                 20.00                                        0.50                         24.00
+11 Laureles                    4.40                                                   0.20                       13.70                                  29.40                 25.40                                        0.40                         26.50
+13 San Javier                 12.10                                                   0.80                       11.20                                  28.00                 23.90                                        0.40                         23.60
+16 Belen                       7.80                                                   0.50                       14.00                                  27.80                 26.10                                        0.60                         23.10
+
+Grupo OPS dominante por comuna:
+COMUNA_RES
+03 Manrique           Enfermedades del sistema circulatorio
+04 Aranjuez           Enfermedades del sistema circulatorio
+06 Doce De Octubre    Enfermedades del sistema circulatorio
+07 Robledo            Enfermedades del sistema circulatorio
+08 Villa Hermosa      Enfermedades del sistema circulatorio
+09 Buenos Aires       Enfermedades del sistema circulatorio
+10 La Candelaria      Enfermedades del sistema circulatorio
+11 Laureles           Enfermedades del sistema circulatorio
+13 San Javier         Enfermedades del sistema circulatorio
+16 Belen              Enfermedades del sistema circulatorio
+dtype: object
+
+Porcentaje del grupo dominante por comuna:
+COMUNA_RES
+03 Manrique          28.80
+04 Aranjuez          29.40
+06 Doce De Octubre   29.30
+07 Robledo           26.30
+08 Villa Hermosa     28.60
+09 Buenos Aires      28.30
+10 La Candelaria     32.00
+11 Laureles          29.40
+13 San Javier        28.00
+16 Belen             27.80
+dtype: float64</code></pre>
+</div>
+</div>
+<p>En el análisis entre el grupo de causas de muerte y la comuna de residencia (Top 10), se observa un patrón bastante homogéneo entre las diferentes zonas.</p>
+<p>En todas las comunas analizadas, el grupo dominante corresponde a las enfermedades del sistema circulatorio, con proporciones que oscilan aproximadamente entre el 26% y el 32%. Esto indica que este tipo de causa de muerte es consistente en todo el territorio urbano, sin depender fuertemente de la ubicación geográfica.</p>
+<p>Las neoplasias (tumores) y el grupo de “todas las demás enfermedades” también presentan participaciones importantes y relativamente estables entre comunas, lo que refuerza la idea de una estructura de mortalidad similar en la ciudad.</p>
+<p>Por otro lado, las causas externas muestran una mayor variabilidad entre comunas, alcanzando valores más altos en zonas como San Javier y Robledo, lo que podría sugerir diferencias en factores de riesgo asociados a este tipo de eventos.</p>
+<p>En general, aunque existen pequeñas variaciones porcentuales, no se evidencian diferencias territoriales marcadas en la distribución de las causas de muerte, lo que sugiere que el perfil de mortalidad es bastante uniforme entre las principales comunas del dataset.</p>
+<hr>
+</section>
+</section>
+<section id="dataset-final" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-final">Dataset final</h2>
+<div id="5fbc80ab" class="cell" data-execution_count="576">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Variables finales para dashboard</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>FEATURES_DASHBOARD <span class="op">=</span> [</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NOM_667_OPS_GRUPO"</span>,   <span class="co"># Variable objetivo</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ANO"</span>, <span class="st">"MES"</span>,          <span class="co"># Temporales</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SEXO"</span>,                <span class="co"># Demográfica</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"EDAD_SIMPLE"</span>,         <span class="co"># Demográfica (numérica)</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ETAREO_QUIN"</span>,         <span class="co"># Demográfica (categórica)</span></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"EST_CIVIL"</span>,           <span class="co"># Demográfica</span></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SEG_SOCIAL"</span>,          <span class="co"># Socioeconómica</span></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NIVEL_EDU_GRUPO"</span>,     <span class="co"># Socioeconómica</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"COMUNA_RES"</span>,          <span class="co"># Geográfica</span></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"BARRIO_RES"</span>,          <span class="co"># Geográfica (mapas)</span></span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> df_clean[FEATURES_DASHBOARD].copy()</span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset final: </span><span class="sc">{</span>df_final<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">:,}</span><span class="ss"> registros × </span><span class="sc">{</span>df_final<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> variables"</span>)</span>
+<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Columnas: </span><span class="sc">{</span><span class="bu">list</span>(df_final.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-20"><a href="#cb50-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Balance de clases:"</span>)</span>
+<span id="cb50-21"><a href="#cb50-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_final[<span class="st">"NOM_667_OPS_GRUPO"</span>].value_counts())</span>
+<span id="cb50-22"><a href="#cb50-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-23"><a href="#cb50-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Exportar</span></span>
+<span id="cb50-24"><a href="#cb50-24" aria-hidden="true" tabindex="-1"></a>df_final.to_csv(<span class="st">"defunciones_clean.csv"</span>, index<span class="op">=</span><span class="va">False</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>)</span>
+<span id="cb50-25"><a href="#cb50-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-26"><a href="#cb50-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">✓ Dataset exportado correctamente"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset final: 145,377 registros × 11 variables
+
+Columnas: ['NOM_667_OPS_GRUPO', 'ANO', 'MES', 'SEXO', 'EDAD_SIMPLE', 'ETAREO_QUIN', 'EST_CIVIL', 'SEG_SOCIAL', 'NIVEL_EDU_GRUPO', 'COMUNA_RES', 'BARRIO_RES']
+
+Balance de clases:
+NOM_667_OPS_GRUPO
+Enfermedades del sistema circulatorio                    41337
+Neoplasias (Tumores)                                     34857
+Todas las demas enfermedades                             33785
+Enfermedades Transmisibles                               19070
+Causas externas                                          14462
+Ciertas afecciones originadas en el periodo perinatal     1121
+Signos sintomas y afecciones mal definidas                 745
+Name: count, dtype: int64
+
+✓ Dataset exportado correctamente</code></pre>
+</div>
+</div>
+<p>Luego del proceso de limpieza y selección de variables, se obtiene un dataset final compuesto por variables relevantes para el análisis y la construcción del dashboard.</p>
+<p>Se excluyen variables que no aportan información significativa o que presentan redundancia, con el objetivo de trabajar con un conjunto de datos más claro y enfocado.</p>
+<p>El dataset final incluye variables temporales, demográficas, socioeconómicas y geográficas, lo que permite analizar las defunciones desde diferentes perspectivas.</p>
+<p>En particular, se destaca el uso de la variable EDAD_SIMPLE como medida principal de edad, ya que presenta valores consistentes y directamente interpretables.</p>
+<p>Este dataset se encuentra listo para ser utilizado en la construcción de visualizaciones interactivas, facilitando la exploración de patrones y la comunicación de los hallazgos obtenidos.</p>
+<hr>
+</section>
+<section id="conclusiones-y-hallazgos" class="level2">
+<h2 class="anchored" data-anchor-id="conclusiones-y-hallazgos">Conclusiones y hallazgos</h2>
+<p>El análisis exploratorio de datos permitió caracterizar el comportamiento de la mortalidad a partir de diferentes dimensiones: temporal, demográfica, socioeconómica y geográfica.</p>
+<p>Desde la perspectiva temporal, se observa un comportamiento relativamente estable en los años previos, con un cambio notable en 2020 asociado al aumento de las enfermedades transmisibles, lo que evidencia la influencia de factores externos en la dinámica de la mortalidad.</p>
+<p>En el ámbito demográfico, se identifican diferencias importantes por sexo y edad. En particular, las causas externas presentan una mayor proporción en hombres, especialmente en edades jóvenes, mientras que las enfermedades del sistema circulatorio y las neoplasias se concentran en edades más avanzadas, confirmando la relevancia de la edad como variable explicativa.</p>
+<p>En cuanto a las causas de muerte, se evidencia una fuerte concentración en tres grupos principales: enfermedades del sistema circulatorio, neoplasias y otras enfermedades, lo que define la estructura general del fenómeno analizado.</p>
+<p>Desde la perspectiva socioeconómica, variables como el nivel educativo y el régimen de seguridad social aportan contexto sobre la población, aunque no generan diferencias marcadas entre los grupos de causas de muerte.</p>
+<p>A nivel geográfico, la distribución de las causas de muerte es bastante homogénea entre las principales comunas, sin evidenciar patrones territoriales fuertes.</p>
+<p>En conjunto, estos resultados permiten comprender la estructura del dataset y constituyen una base sólida para la construcción del dashboard, facilitando la exploración interactiva y la comunicación de los patrones identificados.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
