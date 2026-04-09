@@ -71,10 +71,11 @@ fig_sex = px.histogram(
     title="Grupo OPS vs Sexo"
 )
 
-fig_agegrp = px.histogram(
-    df,
-    x="ETAREO_QUIN",
-    color="NOM_667_OPS_GRUPO",
+agegrp_counts = pd.crosstab(df["ETAREO_QUIN"], df["NOM_667_OPS_GRUPO"])
+fig_agegrp = px.imshow(
+    agegrp_counts,
+    text_auto=True,
+    labels=dict(x="Grupo OPS", y="Grupo Etario", color="Count"),
     title="Grupo OPS vs Grupo Etario"
 )
 
@@ -186,10 +187,19 @@ def render_tab(tab):
     Input("edad_input", "value")
 )
 def predict_group(edad):
-
+    # Validar la entrada
     if edad is None:
-        return ""
+        return "Ingresa una edad"
+    
+    try:
+        edad = float(edad)
+    except ValueError:
+        return "Edad inválida"
 
+    if edad < 0 or edad > 120:
+        return "Ingresa una edad válida (0-120)"
+
+    # Predicción
     pred = rf.predict([[edad]])[0]
     label = target_encoder.inverse_transform([pred])[0]
 
