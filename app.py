@@ -324,7 +324,7 @@ NAVBAR = dbc.Navbar(
             ], align="center", className="g-0"),
             href="#", style={"textDecoration": "none"}
         ),
-        dbc.NavbarText("Ciencia de Datos · Portafolio", className="text-white-50 small d-none d-md-block"),
+        html.Span("Ciencia de Datos · Portafolio", className="text-white-50 small d-none d-md-block"),
     ], fluid=True),
     color="#1d3557", dark=True, sticky="top", className="shadow-sm mb-0"
 )
