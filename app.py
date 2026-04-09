@@ -52,11 +52,15 @@ tree_acc = accuracy_score(y_test, tree_pred)
 
 fig_age = px.histogram(df, x="EDAD_SIMPLE", nbins=30, title="Distribución de Edad")
 
+# Crear DataFrame desde value_counts y resetear índice
+df_ops_counts = df['NOM_667_OPS_GRUPO'].value_counts().reset_index()
+df_ops_counts.columns = ['NOM_667_OPS_GRUPO', 'count']
+
 fig_ops = px.bar(
-    df["NOM_667_OPS_GRUPO"].value_counts().reset_index(),
-    x="index",
-    y="NOM_667_OPS_GRUPO",
-    title="Distribución de Grupo OPS"
+    df_ops_counts,
+    x='NOM_667_OPS_GRUPO',
+    y='count',
+    title="Distribución de NOM_667_OPS_GRUPO"
 )
 
 fig_sex = px.histogram(
