@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["gunicorn", "app:server", "--bind", "0.0.0.0:10000", "--timeout", "120"]
+CMD ["sh", "-c", "gunicorn app:server --bind 0.0.0.0:$PORT"]
