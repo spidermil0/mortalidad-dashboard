@@ -145,7 +145,7 @@ El proyecto está preparado para ser desplegado en Render como Web Service.
 ## 👥 Autores
 
 **Camilo González & Rubén Esguerra**
-Proyecto de Análisis de Datos – Universidad
+Proyecto de Visualización de Datos – Universidad
 
 ---
 
