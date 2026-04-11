@@ -1,6 +1,7 @@
 # =============================================================================
-# DASHBOARD DE MORTALIDAD — MEDELLÍN 2012–2021
-# Autores: Camilo González & Rubén Esguerra
+# Dashboard: Análisis de Mortalidad en Medellín (2012–2021)
+# Variable objetivo: NOM_667_OPS_GRUPO
+# Stack: Dash + Plotly + scikit-learn + Dash Bootstrap Components
 # =============================================================================
 
 import warnings
@@ -13,17 +14,17 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 import dash
-from dash import dcc, html, Input, Output, State, dash_table
+from dash import dcc, html, Input, Output, State, callback
 import dash_bootstrap_components as dbc
 
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import OrdinalEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import (
-    accuracy_score, classification_report, confusion_matrix
+    accuracy_score, classification_report,
+    confusion_matrix, f1_score, precision_score, recall_score
 )
-from sklearn.impute import SimpleImputer
 
 # =============================================================================
 # 1. CARGA Y PREPARACIÓN DE DATOS
@@ -31,878 +32,822 @@ from sklearn.impute import SimpleImputer
 
 df = pd.read_csv("defunciones_clean.csv")
 
-# Paleta de colores por grupo OPS
-OPS_GRUPOS = df["NOM_667_OPS_GRUPO"].unique().tolist()
+# Paleta de colores institucional
 OPS_COLORS = {
-    "Enfermedades del sistema circulatorio": "#E63946",
-    "Neoplasias (Tumores)":                  "#457B9D",
-    "Todas las demas enfermedades":          "#2A9D8F",
-    "Enfermedades Transmisibles":            "#E9C46A",
-    "Causas externas":                       "#F4A261",
-    "Signos sintomas y afecciones mal definidas": "#8338EC",
-    "Ciertas afecciones originadas en el periodo perinatal": "#06D6A0",
+    "Enfermedades del sistema circulatorio":                "#E63946",
+    "Neoplasias (Tumores)":                                 "#457B9D",
+    "Todas las demas enfermedades":                         "#2A9D8F",
+    "Enfermedades Transmisibles":                           "#E9C46A",
+    "Causas externas":                                      "#F4A261",
+    "Ciertas afecciones originadas en el periodo perinatal":"#6D6875",
+    "Signos sintomas y afecciones mal definidas":           "#A8DADC",
 }
+
 COLOR_SEQ = list(OPS_COLORS.values())
 
-MESES_NOMBRES = {
-    1:"Ene",2:"Feb",3:"Mar",4:"Abr",5:"May",6:"Jun",
-    7:"Jul",8:"Ago",9:"Sep",10:"Oct",11:"Nov",12:"Dic"
-}
-
-# ── Orden grupo etario ──────────────────────────────────────────────────────
-ETAREO_ORDER = [
-    "< 1 año","1-4","5-9","10-14","15-19","20-24","25-29","30-34",
-    "35-39","40-44","45-49","50-54","55-59","60-64","65-69",
-    "70-74","75-79","80-84","85-89","90-94","95-99","100 y mas"
-]
+# Orden de grupos OPS por frecuencia
+OPS_ORDER = df["NOM_667_OPS_GRUPO"].value_counts().index.tolist()
 
 # =============================================================================
-# 2. ENTRENAMIENTO DE MODELOS
+# 2. PREPARACIÓN PARA MODELOS
 # =============================================================================
 
-FEATURE_COLS = ["SEXO","EDAD_SIMPLE","MES","EST_CIVIL",
-                "SEG_SOCIAL","NIVEL_EDU_GRUPO","COMUNA_RES"]
-TARGET_COL   = "NOM_667_OPS_GRUPO"
+FEATURES = ["SEXO", "EDAD_SIMPLE", "EST_CIVIL", "SEG_SOCIAL", "NIVEL_EDU_GRUPO", "ANO", "MES"]
+TARGET   = "NOM_667_OPS_GRUPO"
 
-df_model = df[FEATURE_COLS + [TARGET_COL]].copy()
+CAT_FEATURES = ["SEXO", "EST_CIVIL", "SEG_SOCIAL", "NIVEL_EDU_GRUPO"]
+NUM_FEATURES = ["EDAD_SIMPLE", "ANO", "MES"]
+
+df_model = df[FEATURES + [TARGET]].copy()
 df_model["EDAD_SIMPLE"] = df_model["EDAD_SIMPLE"].fillna(df_model["EDAD_SIMPLE"].median())
 
-# Codificar categóricas
-cat_cols = ["SEXO","EST_CIVIL","SEG_SOCIAL","NIVEL_EDU_GRUPO","COMUNA_RES"]
-enc = OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1)
-df_model[cat_cols] = enc.fit_transform(df_model[cat_cols])
+# Label encoders
+encoders = {}
+for col in CAT_FEATURES:
+    le = LabelEncoder()
+    df_model[col] = le.fit_transform(df_model[col].astype(str))
+    encoders[col] = le
 
-X = df_model[FEATURE_COLS]
-y = df_model[TARGET_COL]
+# Encoder para target
+le_target = LabelEncoder()
+df_model[TARGET] = le_target.fit_transform(df_model[TARGET])
+
+X = df_model[FEATURES]
+y = df_model[TARGET]
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-rf  = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42, n_jobs=-1)
-dt  = DecisionTreeClassifier(max_depth=5, random_state=42)
+# ---- Random Forest ----
+rf_model = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42, n_jobs=-1)
+rf_model.fit(X_train, y_train)
+rf_pred = rf_model.predict(X_test)
 
-rf.fit(X_train, y_train)
-dt.fit(X_train, y_train)
+# ---- Decision Tree ----
+dt_model = DecisionTreeClassifier(max_depth=8, random_state=42)
+dt_model.fit(X_train, y_train)
+dt_pred = dt_model.predict(X_test)
 
-y_pred_rf = rf.predict(X_test)
-y_pred_dt = dt.predict(X_test)
+# ---- Métricas ----
+def get_metrics(y_true, y_pred, name):
+    return {
+        "Modelo":     name,
+        "Accuracy":   round(accuracy_score(y_true, y_pred) * 100, 2),
+        "Precision":  round(precision_score(y_true, y_pred, average="weighted", zero_division=0) * 100, 2),
+        "Recall":     round(recall_score(y_true, y_pred, average="weighted", zero_division=0) * 100, 2),
+        "F1-Score":   round(f1_score(y_true, y_pred, average="weighted", zero_division=0) * 100, 2),
+    }
 
-acc_rf = accuracy_score(y_test, y_pred_rf)
-acc_dt = accuracy_score(y_test, y_pred_dt)
+metrics_df = pd.DataFrame([
+    get_metrics(y_test, rf_pred, "Random Forest"),
+    get_metrics(y_test, dt_pred, "Árbol de Decisión"),
+])
 
-labels = sorted(y.unique())
+# Feature importances
+feat_imp = pd.DataFrame({
+    "Variable":    FEATURES,
+    "Importancia": rf_model.feature_importances_
+}).sort_values("Importancia", ascending=True)
 
 # =============================================================================
-# 3. GRÁFICOS — UNIVARIADO
+# 3. FUNCIONES DE GRÁFICOS
 # =============================================================================
 
-def fig_ops_bar():
-    vc = df["NOM_667_OPS_GRUPO"].value_counts().reset_index()
-    vc.columns = ["Grupo","Defunciones"]
-    pct = (vc["Defunciones"] / vc["Defunciones"].sum() * 100).round(1)
-    vc["Porcentaje"] = pct
+def fig_ops_dist():
+    counts = df["NOM_667_OPS_GRUPO"].value_counts().reset_index()
+    counts.columns = ["Grupo OPS", "Cantidad"]
+    counts["Porcentaje"] = (counts["Cantidad"] / counts["Cantidad"].sum() * 100).round(1)
     fig = px.bar(
-        vc, x="Defunciones", y="Grupo", orientation="h",
-        color="Grupo", color_discrete_map=OPS_COLORS,
-        text=pct.map(lambda x: f"{x}%"),
-        title="Distribución de causas de muerte (Grupo OPS)",
-        template="plotly_dark",
+        counts, x="Cantidad", y="Grupo OPS", orientation="h",
+        color="Grupo OPS", color_discrete_map=OPS_COLORS,
+        text=counts["Porcentaje"].apply(lambda x: f"{x}%"),
+        title="Distribución de Causas de Muerte (Grupo OPS)"
     )
     fig.update_traces(textposition="outside")
-    fig.update_layout(showlegend=False, yaxis={"categoryorder":"total ascending"},
-                      margin=dict(l=10,r=40,t=50,b=10), height=380)
-    return fig
-
-def fig_ops_pie():
-    vc = df["NOM_667_OPS_GRUPO"].value_counts().reset_index()
-    vc.columns = ["Grupo","Defunciones"]
-    fig = px.pie(
-        vc, names="Grupo", values="Defunciones",
-        color="Grupo", color_discrete_map=OPS_COLORS,
-        title="Proporción por grupo OPS",
-        hole=0.4, template="plotly_dark",
-    )
-    fig.update_traces(textposition="inside", textinfo="percent")
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=380,
-                      legend=dict(font=dict(size=10)))
+    fig.update_layout(**LAYOUT_BASE, showlegend=False, height=380)
     return fig
 
 def fig_sexo():
-    vc = df[df["SEXO"]!="Indeterminado"]["SEXO"].value_counts().reset_index()
-    vc.columns = ["Sexo","Defunciones"]
-    fig = px.bar(vc, x="Sexo", y="Defunciones", color="Sexo",
-                 color_discrete_sequence=["#457B9D","#E63946"],
-                 text="Defunciones", title="Distribución por sexo",
-                 template="plotly_dark")
+    counts = df["SEXO"].value_counts().reset_index()
+    counts.columns = ["Sexo", "Cantidad"]
+    fig = px.bar(counts, x="Sexo", y="Cantidad", color="Sexo",
+                 color_discrete_sequence=["#457B9D","#E63946","#A8DADC"],
+                 text="Cantidad", title="Distribución por Sexo")
     fig.update_traces(textposition="outside")
-    fig.update_layout(showlegend=False, margin=dict(l=10,r=10,t=50,b=10), height=340)
+    fig.update_layout(**LAYOUT_BASE, showlegend=False, height=350)
     return fig
 
-def fig_edad_hist():
-    fig = px.histogram(
-        df.dropna(subset=["EDAD_SIMPLE"]), x="EDAD_SIMPLE",
-        nbins=30, title="Distribución de edad al fallecimiento",
-        template="plotly_dark", color_discrete_sequence=["#2A9D8F"],
-    )
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=340,
-                      xaxis_title="Edad (años)", yaxis_title="Frecuencia")
-    return fig
-
-def fig_etareo():
-    vc = df["ETAREO_QUIN"].value_counts().reindex(ETAREO_ORDER).dropna().reset_index()
-    vc.columns = ["Grupo etario","Defunciones"]
-    fig = px.bar(vc, x="Grupo etario", y="Defunciones",
-                 color_discrete_sequence=["#E9C46A"],
-                 title="Distribución por grupo etario (quinquenal)",
-                 template="plotly_dark")
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=340,
-                      xaxis_tickangle=-45)
+def fig_edad():
+    fig = px.histogram(df.dropna(subset=["EDAD_SIMPLE"]), x="EDAD_SIMPLE",
+                       nbins=30, title="Distribución de Edad al Fallecimiento",
+                       color_discrete_sequence=["#457B9D"])
+    fig.update_layout(**LAYOUT_BASE, height=350)
+    fig.update_xaxes(title="Edad (años)")
+    fig.update_yaxes(title="Frecuencia")
     return fig
 
 def fig_seg_social():
-    vc = df["SEG_SOCIAL"].value_counts().reset_index()
-    vc.columns = ["Régimen","Defunciones"]
-    fig = px.bar(vc, x="Régimen", y="Defunciones",
-                 color="Régimen", text="Defunciones",
-                 title="Distribución por régimen de seguridad social",
-                 template="plotly_dark",
-                 color_discrete_sequence=px.colors.qualitative.Set2)
+    counts = df[df["SEG_SOCIAL"] != "Sin info"]["SEG_SOCIAL"].value_counts().reset_index()
+    counts.columns = ["Régimen", "Cantidad"]
+    fig = px.bar(counts, x="Régimen", y="Cantidad", color="Régimen",
+                 color_discrete_sequence=px.colors.qualitative.Set2,
+                 text="Cantidad", title="Distribución por Régimen de Seguridad Social")
     fig.update_traces(textposition="outside")
-    fig.update_layout(showlegend=False, margin=dict(l=10,r=10,t=50,b=10), height=340)
+    fig.update_layout(**LAYOUT_BASE, showlegend=False, height=350)
     return fig
 
 def fig_edu():
-    vc = df["NIVEL_EDU_GRUPO"].value_counts().reset_index()
-    vc.columns = ["Nivel educativo","Defunciones"]
-    fig = px.bar(vc, x="Nivel educativo", y="Defunciones",
-                 color="Nivel educativo", text="Defunciones",
-                 title="Distribución por nivel educativo",
-                 template="plotly_dark",
-                 color_discrete_sequence=px.colors.qualitative.Pastel)
+    orden = ["Básica", "Media", "Técnico/Tecnológico", "Superior", "Sin info"]
+    counts = df["NIVEL_EDU_GRUPO"].value_counts().reindex(orden).dropna().reset_index()
+    counts.columns = ["Nivel", "Cantidad"]
+    fig = px.bar(counts, x="Nivel", y="Cantidad", color="Nivel",
+                 color_discrete_sequence=px.colors.qualitative.Pastel,
+                 text="Cantidad", title="Distribución por Nivel Educativo")
     fig.update_traces(textposition="outside")
-    fig.update_layout(showlegend=False, margin=dict(l=10,r=10,t=50,b=10), height=340)
+    fig.update_layout(**LAYOUT_BASE, showlegend=False, height=350)
     return fig
 
-def fig_ano():
-    vc = df.groupby("ANO").size().reset_index(name="Defunciones")
-    fig = px.line(vc, x="ANO", y="Defunciones", markers=True,
-                  title="Defunciones totales por año",
-                  template="plotly_dark", color_discrete_sequence=["#E63946"])
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=300,
-                      xaxis=dict(tickmode="linear", dtick=1))
+def fig_anual():
+    anual = df.groupby("ANO").size().reset_index(name="Defunciones")
+    fig = px.line(anual, x="ANO", y="Defunciones", markers=True,
+                  title="Total de Defunciones por Año",
+                  color_discrete_sequence=["#E63946"])
+    fig.update_layout(**LAYOUT_BASE, height=350)
+    fig.update_xaxes(dtick=1)
     return fig
 
-def fig_mes():
-    vc = df.groupby("MES").size().reset_index(name="Defunciones")
-    vc["MesNombre"] = vc["MES"].map(MESES_NOMBRES)
-    fig = px.bar(vc, x="MesNombre", y="Defunciones",
-                 color_discrete_sequence=["#457B9D"],
-                 title="Defunciones por mes (promedio histórico)",
-                 template="plotly_dark")
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=300,
-                      xaxis_title="Mes")
+# ---- Bivariado ----
+def fig_ops_sexo():
+    ct = pd.crosstab(df["NOM_667_OPS_GRUPO"], df["SEXO"], normalize="index") * 100
+    ct = ct.reset_index()
+    ct_melted = ct.melt(id_vars="NOM_667_OPS_GRUPO", var_name="Sexo", value_name="Porcentaje")
+    fig = px.bar(ct_melted, x="NOM_667_OPS_GRUPO", y="Porcentaje", color="Sexo",
+                 barmode="stack",
+                 color_discrete_sequence=["#457B9D","#E63946","#A8DADC"],
+                 title="Distribución de Sexo por Grupo OPS (%)")
+    fig.update_xaxes(title="", tickangle=-25)
+    fig.update_layout(**LAYOUT_BASE, height=420)
     return fig
 
-# =============================================================================
-# 4. GRÁFICOS — BIVARIADO
-# =============================================================================
-
-def fig_biv_sexo(ano_filter=None):
-    data = df[df["SEXO"].isin(["Masculino","Femenino"])]
-    if ano_filter:
-        data = data[data["ANO"]==ano_filter]
-    ct = pd.crosstab(data["NOM_667_OPS_GRUPO"], data["SEXO"], normalize="index") * 100
-    ct = ct.reset_index().melt(id_vars="NOM_667_OPS_GRUPO",
-                                value_name="Porcentaje", var_name="Sexo")
-    fig = px.bar(ct, x="NOM_667_OPS_GRUPO", y="Porcentaje", color="Sexo",
-                 barmode="stack", text=ct["Porcentaje"].round(1).map(lambda x: f"{x}%"),
-                 color_discrete_sequence=["#457B9D","#E63946"],
-                 title="Causa de muerte × Sexo (%)",
-                 template="plotly_dark")
-    fig.update_traces(textposition="inside")
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=420,
-                      xaxis_tickangle=-20, legend_title="Sexo",
-                      xaxis_title="")
+def fig_ops_edad():
+    df_plot = df.dropna(subset=["EDAD_SIMPLE"])
+    fig = px.box(df_plot, x="NOM_667_OPS_GRUPO", y="EDAD_SIMPLE",
+                 color="NOM_667_OPS_GRUPO", color_discrete_map=OPS_COLORS,
+                 title="Distribución de Edad por Grupo OPS")
+    fig.update_xaxes(title="", tickangle=-25)
+    fig.update_yaxes(title="Edad (años)")
+    fig.update_layout(**LAYOUT_BASE, showlegend=False, height=430)
     return fig
 
-def fig_biv_etareo(ano_filter=None):
-    data = df.dropna(subset=["ETAREO_QUIN"])
-    if ano_filter:
-        data = data[data["ANO"]==ano_filter]
-    hm = pd.crosstab(data["NOM_667_OPS_GRUPO"], data["ETAREO_QUIN"])
-    hm = hm.reindex(columns=[c for c in ETAREO_ORDER if c in hm.columns])
-    hm_norm = hm.div(hm.sum(axis=1), axis=0).round(3) * 100
-    fig = px.imshow(
-        hm_norm, aspect="auto",
-        color_continuous_scale="YlOrRd",
-        title="Causa de muerte × Grupo etario (% por fila)",
-        template="plotly_dark",
-        labels={"color":"% dentro del grupo OPS"},
-    )
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=380,
-                      xaxis_tickangle=-45)
-    return fig
-
-def fig_biv_temporal(ano_filter=None):
-    evol = df.groupby(["ANO","NOM_667_OPS_GRUPO"]).size().reset_index(name="Defunciones")
+def fig_ops_anual():
+    evol = df.groupby(["ANO", "NOM_667_OPS_GRUPO"]).size().reset_index(name="Defunciones")
     fig = px.line(evol, x="ANO", y="Defunciones", color="NOM_667_OPS_GRUPO",
-                  markers=True, color_discrete_map=OPS_COLORS,
-                  title="Evolución temporal de causas de muerte",
-                  template="plotly_dark")
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=400,
-                      xaxis=dict(tickmode="linear", dtick=1),
-                      legend_title="Grupo OPS",
-                      legend=dict(font=dict(size=10)))
+                  color_discrete_map=OPS_COLORS, markers=True,
+                  title="Evolución Anual de Defunciones por Grupo OPS")
+    fig.update_xaxes(dtick=1, title="Año")
+    fig.update_layout(**LAYOUT_BASE, height=430)
     return fig
 
-def fig_biv_seg(ano_filter=None):
-    data = df[df["SEG_SOCIAL"]!="Sin info"]
-    if ano_filter:
-        data = data[data["ANO"]==ano_filter]
-    ct = pd.crosstab(data["NOM_667_OPS_GRUPO"], data["SEG_SOCIAL"],
-                     normalize="index") * 100
-    fig = px.imshow(ct.round(1), aspect="auto",
-                    color_continuous_scale="Blues",
-                    title="Causa de muerte × Régimen de seguridad social (% por fila)",
-                    template="plotly_dark",
-                    labels={"color":"% dentro del grupo OPS"})
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=380)
+def fig_ops_seg():
+    df_s = df[df["SEG_SOCIAL"] != "Sin info"]
+    ct = pd.crosstab(df_s["NOM_667_OPS_GRUPO"], df_s["SEG_SOCIAL"], normalize="index") * 100
+    ct_melted = ct.reset_index().melt(id_vars="NOM_667_OPS_GRUPO", var_name="Régimen", value_name="Porcentaje")
+    fig = px.bar(ct_melted, x="NOM_667_OPS_GRUPO", y="Porcentaje", color="Régimen",
+                 barmode="stack",
+                 color_discrete_sequence=px.colors.qualitative.Set2,
+                 title="Seguridad Social por Grupo OPS (%)")
+    fig.update_xaxes(title="", tickangle=-25)
+    fig.update_layout(**LAYOUT_BASE, height=420)
     return fig
 
-def fig_biv_edu(ano_filter=None):
-    data = df[~df["NIVEL_EDU_GRUPO"].isin(["Sin info"])]
-    if ano_filter:
-        data = data[data["ANO"]==ano_filter]
-    orden_edu = ["Básica","Media","Técnico/Tecnológico","Superior"]
-    ct = pd.crosstab(data["NOM_667_OPS_GRUPO"], data["NIVEL_EDU_GRUPO"],
-                     normalize="index") * 100
-    ct = ct.reindex(columns=[c for c in orden_edu if c in ct.columns])
-    ct_m = ct.reset_index().melt(id_vars="NOM_667_OPS_GRUPO",
-                                  value_name="Porcentaje", var_name="Nivel")
-    fig = px.bar(ct_m, x="NOM_667_OPS_GRUPO", y="Porcentaje", color="Nivel",
-                 barmode="group",
-                 title="Causa de muerte × Nivel educativo (%)",
-                 template="plotly_dark",
-                 color_discrete_sequence=px.colors.qualitative.Set2)
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=420,
-                      xaxis_tickangle=-20, legend_title="Nivel educativo",
-                      xaxis_title="")
+def fig_heatmap_edad_ops():
+    # Etareos ordenados correctamente
+    orden_etareo = [
+        "<1","1-4","5-9","10-14","15-19","20-24","25-29","30-34",
+        "35-39","40-44","45-49","50-54","55-59","60-64","65-69",
+        "70-74","75-79","80-84","85-89","90-94","95-99","100 y más"
+    ]
+    df_e = df[df["ETAREO_QUIN"].notna() & ~df["ETAREO_QUIN"].isin(["Sin informacion","sin informacion"])]
+    ct = pd.crosstab(df_e["ETAREO_QUIN"], df_e["NOM_667_OPS_GRUPO"], normalize="columns") * 100
+    # Filtrar solo filas que existan
+    idx_valid = [e for e in orden_etareo if e in ct.index]
+    ct = ct.reindex(idx_valid)
+
+    fig = px.imshow(ct, aspect="auto", color_continuous_scale="RdYlBu_r",
+                    title="Grupo Etario vs Grupo OPS (% por causa)",
+                    labels=dict(color="%"))
+    fig.update_layout(**LAYOUT_BASE, height=480)
     return fig
 
-def fig_biv_comuna(ano_filter=None):
-    data = df[~df["COMUNA_RES"].isin(["Sin informacion","sin informacion"])]
-    if ano_filter:
-        data = data[data["ANO"]==ano_filter]
-    top10 = data["COMUNA_RES"].value_counts().head(10).index
-    data = data[data["COMUNA_RES"].isin(top10)]
-    ct = pd.crosstab(data["COMUNA_RES"], data["NOM_667_OPS_GRUPO"],
-                     normalize="index") * 100
-    fig = px.imshow(ct.round(1), aspect="auto",
-                    color_continuous_scale="Teal",
-                    title="Top 10 comunas × Causa de muerte (% por fila)",
-                    template="plotly_dark",
-                    labels={"color":"% dentro de la comuna"})
-    fig.update_layout(margin=dict(l=10,r=10,t=50,b=10), height=400)
+# ---- Modelos ----
+def fig_conf_matrix(model_name):
+    preds = rf_pred if model_name == "Random Forest" else dt_pred
+    labels = le_target.classes_
+    cm = confusion_matrix(y_test, preds)
+    cm_pct = (cm.astype(float) / cm.sum(axis=1)[:, np.newaxis] * 100).round(1)
+    # Etiquetas cortas
+    short = [l[:20]+"…" if len(l) > 20 else l for l in labels]
+    fig = px.imshow(cm_pct, x=short, y=short,
+                    color_continuous_scale="Blues", aspect="auto",
+                    title=f"Matriz de Confusión — {model_name} (%)",
+                    labels=dict(color="%"))
+    fig.update_layout(**LAYOUT_BASE, height=460)
     return fig
 
-# =============================================================================
-# 5. GRÁFICOS — MODELADO
-# =============================================================================
-
-def fig_confusion(y_true, y_pred, title):
-    cm = confusion_matrix(y_true, y_pred, labels=labels)
-    cm_pct = (cm / cm.sum(axis=1, keepdims=True) * 100).round(1)
-    short_labels = [l[:25]+"…" if len(l)>25 else l for l in labels]
-    fig = px.imshow(
-        cm_pct, x=short_labels, y=short_labels,
-        color_continuous_scale="Blues", aspect="auto",
-        title=title, template="plotly_dark",
-        labels={"color":"% real"},
-        text_auto=True,
-    )
-    fig.update_layout(margin=dict(l=10,r=10,t=60,b=10),
-                      height=450,
-                      xaxis_title="Predicho",
-                      yaxis_title="Real",
-                      xaxis_tickangle=-30)
+def fig_feat_imp():
+    fig = px.bar(feat_imp, x="Importancia", y="Variable", orientation="h",
+                 color="Importancia", color_continuous_scale="Teal",
+                 title="Importancia de Variables — Random Forest")
+    fig.update_layout(**LAYOUT_BASE, showlegend=False, height=380)
     return fig
 
-def fig_importancias():
-    imp = pd.Series(rf.feature_importances_, index=FEATURE_COLS).sort_values()
-    fig = px.bar(imp, orientation="h",
-                 title="Importancia de variables — Random Forest",
-                 template="plotly_dark",
-                 color=imp.values,
-                 color_continuous_scale="Reds")
-    fig.update_layout(showlegend=False, coloraxis_showscale=False,
-                      margin=dict(l=10,r=10,t=50,b=10), height=340,
-                      xaxis_title="Importancia (Gini)", yaxis_title="")
-    return fig
-
-def fig_comparacion_modelos():
-    rep_rf = classification_report(y_test, y_pred_rf, output_dict=True)
-    rep_dt = classification_report(y_test, y_pred_dt, output_dict=True)
-    rows = []
-    for lbl in labels:
-        short = lbl[:30]+"…" if len(lbl)>30 else lbl
-        rows.append({
-            "Grupo OPS": short,
-            "RF Precision": round(rep_rf[lbl]["precision"],3),
-            "RF Recall":    round(rep_rf[lbl]["recall"],3),
-            "RF F1":        round(rep_rf[lbl]["f1-score"],3),
-            "DT Precision": round(rep_dt[lbl]["precision"],3),
-            "DT Recall":    round(rep_dt[lbl]["recall"],3),
-            "DT F1":        round(rep_dt[lbl]["f1-score"],3),
-        })
-    return pd.DataFrame(rows)
-
-# =============================================================================
-# 6. LAYOUT — COMPONENTES REUTILIZABLES
-# =============================================================================
-
-NAVBAR = dbc.Navbar(
-    dbc.Container([
-        dbc.Row([
-            dbc.Col(html.Img(src="https://img.icons8.com/fluency/48/heart-with-pulse.png",
-                             height="40px"), width="auto"),
-            dbc.Col(dbc.NavbarBrand(
-                "Dashboard de Mortalidad — Medellín 2012–2021",
-                style={"fontSize":"1.2rem","fontWeight":"700","color":"#fff"}
-            )),
-        ], align="center"),
-    ], fluid=True),
-    color="#1a1a2e", dark=True, sticky="top",
-    style={"borderBottom":"2px solid #E63946"}
+# Layout base para gráficos
+LAYOUT_BASE = dict(
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    font=dict(family="IBM Plex Sans, sans-serif", size=12, color="#E0E6ED"),
+    title_font=dict(size=14, color="#E0E6ED"),
+    margin=dict(l=20, r=20, t=50, b=20),
+    legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=10)),
 )
 
-def kpi_card(titulo, valor, icono, color):
-    return dbc.Card([
-        dbc.CardBody([
-            html.Div([
-                html.Span(icono, style={"fontSize":"2rem"}),
-                html.Div([
-                    html.H3(valor, style={"margin":"0","color":color,"fontWeight":"800"}),
-                    html.P(titulo, style={"margin":"0","fontSize":"0.85rem","color":"#aaa"}),
-                ], style={"marginLeft":"12px"}),
-            ], style={"display":"flex","alignItems":"center"}),
-        ])
-    ], style={"background":"#16213e","border":f"1px solid {color}","borderRadius":"12px"})
-
-def section_header(num, titulo, subtitulo=""):
-    return html.Div([
-        html.Div([
-            html.Span(str(num), style={
-                "background":"#E63946","color":"#fff","borderRadius":"50%",
-                "width":"36px","height":"36px","display":"flex",
-                "alignItems":"center","justifyContent":"center",
-                "fontWeight":"800","fontSize":"1rem","flexShrink":"0"
-            }),
-            html.Div([
-                html.H4(titulo, style={"margin":"0","color":"#fff","fontWeight":"700"}),
-                html.Small(subtitulo, style={"color":"#aaa"}) if subtitulo else None,
-            ], style={"marginLeft":"12px"}),
-        ], style={"display":"flex","alignItems":"center","marginBottom":"20px"}),
-        html.Hr(style={"borderColor":"#333","marginTop":"0"}),
-    ])
-
-def ano_dropdown(id_suffix):
-    anos = sorted(df["ANO"].unique())
-    return dbc.Row([
-        dbc.Col([
-            html.Label("Filtrar por año:", style={"color":"#aaa","fontSize":"0.85rem"}),
-            dcc.Dropdown(
-                id=f"ano-filter-{id_suffix}",
-                options=[{"label":"Todos los años","value":"todos"}] +
-                        [{"label":str(a),"value":a} for a in anos],
-                value="todos",
-                clearable=False,
-                style={"background":"#16213e","color":"#000"},
-            )
-        ], md=4),
-    ], className="mb-3")
-
 # =============================================================================
-# 7. LAYOUT COMPLETO
+# 4. APP LAYOUT
 # =============================================================================
-
-df_cmp = fig_comparacion_modelos()
-
 app = dash.Dash(
     __name__,
-    external_stylesheets=[dbc.themes.CYBORG],
+    external_stylesheets=[
+        dbc.themes.CYBORG,
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Mono&display=swap",
+        dbc.icons.BOOTSTRAP,  # 👈 esto ya incluye los iconos
+    ],
     suppress_callback_exceptions=True,
-    meta_tags=[{"name":"viewport","content":"width=device-width, initial-scale=1"}],
+    meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}],
 )
+
+app.title = "Dashboard · Mortalidad Medellín"
 server = app.server
-app.title = "Mortalidad Medellín"
-
-app.layout = dbc.Container([
-    NAVBAR,
-    html.Div(style={"height":"24px"}),
-
-    # ── SECCIÓN 1: INTRODUCCIÓN ─────────────────────────────────────────────
-    html.Section([
-        section_header(1, "Introducción",
-                       "Contexto del problema y descripción del dataset"),
-        dbc.Row([
-            dbc.Col(kpi_card("Registros totales","145,377","💀","#E63946"), md=3),
-            dbc.Col(kpi_card("Período analizado","2012 – 2021","📅","#457B9D"), md=3),
-            dbc.Col(kpi_card("Grupos OPS","7 causas","🏥","#2A9D8F"),       md=3),
-            dbc.Col(kpi_card("Comunas","22 comunas","🗺️","#E9C46A"),         md=3),
-        ], className="mb-4 g-3"),
-        dbc.Row([
-            dbc.Col(dbc.Card([dbc.CardBody([
-                html.H6("📌 Contexto del problema", className="card-title",
-                        style={"color":"#E63946"}),
-                html.P([
-                    "El estudio de la mortalidad es un pilar fundamental en la epidemiología y la ",
-                    "salud pública. En Medellín, comprender los patrones de defunción permite a ",
-                    "las autoridades sanitarias diseñar políticas de prevención focalizadas, ",
-                    "asignar recursos hospitalarios eficientemente y anticipar tendencias ",
-                    "demográficas críticas."
-                ], style={"color":"#ccc","fontSize":"0.92rem"}),
-                html.P([
-                    "Este análisis examina registros de defunciones del período 2012–2021, ",
-                    "explorando la relación entre la causa de muerte (clasificada según el ",
-                    "sistema OPS/OMS en 7 grupos) y variables demográficas, socioeconómicas ",
-                    "y geográficas de cada fallecido."
-                ], style={"color":"#ccc","fontSize":"0.92rem"}),
-            ])], style={"background":"#16213e","border":"1px solid #333","borderRadius":"10px"}),
-            md=6),
-            dbc.Col(dbc.Card([dbc.CardBody([
-                html.H6("📊 Descripción del dataset", className="card-title",
-                        style={"color":"#457B9D"}),
-                html.Ul([
-                    html.Li("Fuente: Secretaría de Salud de Medellín",
-                            style={"color":"#ccc","fontSize":"0.9rem"}),
-                    html.Li("145,377 registros de defunciones",
-                            style={"color":"#ccc","fontSize":"0.9rem"}),
-                    html.Li("11 variables: demográficas, socioeconómicas y geográficas",
-                            style={"color":"#ccc","fontSize":"0.9rem"}),
-                    html.Li("Variable objetivo: NOM_667_OPS_GRUPO (7 categorías)",
-                            style={"color":"#ccc","fontSize":"0.9rem"}),
-                    html.Li("Dataset limpio: sin valores nulos críticos (39 nulos en edad)",
-                            style={"color":"#ccc","fontSize":"0.9rem"}),
-                    html.Li("Cobertura geográfica: 22 comunas de Medellín",
-                            style={"color":"#ccc","fontSize":"0.9rem"}),
-                ], style={"paddingLeft":"18px"}),
-            ])], style={"background":"#16213e","border":"1px solid #333","borderRadius":"10px"}),
-            md=6),
-        ], className="mb-5 g-3"),
-    ]),
-
-    # ── SECCIÓN 2: PROBLEMA ─────────────────────────────────────────────────
-    html.Section([
-        section_header(2, "Problema de Análisis",
-                       "¿Qué queremos responder con estos datos?"),
-        dbc.Card([dbc.CardBody([
-            html.H6("🔍 Pregunta central de investigación",
-                    style={"color":"#E9C46A","fontWeight":"700"}),
-            html.Blockquote(
-                "¿Qué factores demográficos, socioeconómicos y geográficos "
-                "determinan el grupo de causa de muerte de una defunción en "
-                "Medellín durante el período 2012–2021?",
-                style={"borderLeft":"4px solid #E63946","paddingLeft":"16px",
-                       "color":"#fff","fontStyle":"italic","fontSize":"1.05rem"}
-            ),
-            html.Hr(style={"borderColor":"#333"}),
-            dbc.Row([
-                dbc.Col([
-                    html.H6("📋 Sub-preguntas derivadas",
-                            style={"color":"#2A9D8F"}),
-                    html.Ul([
-                        html.Li("¿Cómo varía la distribución de causas de muerte según sexo y edad?",
-                                style={"color":"#ccc","fontSize":"0.9rem","marginBottom":"6px"}),
-                        html.Li("¿Existen diferencias por régimen de seguridad social o nivel educativo?",
-                                style={"color":"#ccc","fontSize":"0.9rem","marginBottom":"6px"}),
-                        html.Li("¿Se observan cambios temporales en los patrones de mortalidad?",
-                                style={"color":"#ccc","fontSize":"0.9rem","marginBottom":"6px"}),
-                        html.Li("¿Qué comunas presentan mayor concentración de causas específicas?",
-                                style={"color":"#ccc","fontSize":"0.9rem","marginBottom":"6px"}),
-                    ]),
-                ], md=6),
-                dbc.Col([
-                    html.H6("⚠️ Relevancia del problema",
-                            style={"color":"#F4A261"}),
-                    html.P([
-                        "La identificación de patrones de mortalidad permite a los sistemas de salud ",
-                        "anticipar demandas hospitalarias, priorizar programas de prevención en ",
-                        "poblaciones vulnerables y optimizar la distribución territorial de recursos médicos."
-                    ], style={"color":"#ccc","fontSize":"0.9rem"}),
-                ], md=6),
-            ]),
-        ])], style={"background":"#16213e","border":"1px solid #333","borderRadius":"10px",
-                    "marginBottom":"40px"}),
-    ]),
-
-    # ── SECCIÓN 3: OBJETIVOS ────────────────────────────────────────────────
-    html.Section([
-        section_header(3, "Objetivos",
-                       "General y específicos del análisis"),
-        dbc.Row([
-            dbc.Col(dbc.Card([dbc.CardBody([
-                html.H6("🎯 Objetivo General", style={"color":"#E63946","fontWeight":"700"}),
-                html.P([
-                    "Desarrollar un dashboard analítico e interactivo que permita explorar ",
-                    "los patrones de mortalidad en Medellín (2012–2021), identificar factores ",
-                    "asociados a las diferentes causas de muerte y predecir el grupo OPS de ",
-                    "una defunción mediante modelos de machine learning."
-                ], style={"color":"#ccc","fontSize":"0.92rem"}),
-            ])], style={"background":"#1a1a2e","border":"2px solid #E63946",
-                        "borderRadius":"10px","height":"100%"}), md=5),
-            dbc.Col(dbc.Card([dbc.CardBody([
-                html.H6("📌 Objetivos Específicos",
-                        style={"color":"#457B9D","fontWeight":"700"}),
-                html.Ol([
-                    html.Li("Describir la distribución univariada de las principales variables del dataset.",
-                            style={"color":"#ccc","fontSize":"0.88rem","marginBottom":"8px"}),
-                    html.Li("Identificar relaciones entre causa de muerte y variables demográficas/socioeconómicas mediante análisis bivariado.",
-                            style={"color":"#ccc","fontSize":"0.88rem","marginBottom":"8px"}),
-                    html.Li("Entrenar y evaluar dos modelos predictivos (Random Forest y Árbol de Decisión) para clasificar el grupo OPS.",
-                            style={"color":"#ccc","fontSize":"0.88rem","marginBottom":"8px"}),
-                    html.Li("Habilitar una interfaz de predicción interactiva que permita al usuario ingresar datos y obtener una estimación del grupo de causa de muerte.",
-                            style={"color":"#ccc","fontSize":"0.88rem","marginBottom":"8px"}),
-                ], style={"paddingLeft":"18px"}),
-            ])], style={"background":"#1a1a2e","border":"1px solid #457B9D",
-                        "borderRadius":"10px","height":"100%"}), md=7),
-        ], className="mb-5 g-3"),
-    ]),
-
-    # ── SECCIÓN 4.1: UNIVARIADO ─────────────────────────────────────────────
-    html.Section([
-        section_header(4, "Análisis Exploratorio — Sección 4.1: Univariado",
-                       "Distribución individual de las variables más relevantes"),
-        dbc.Row([
-            dbc.Col(dcc.Graph(figure=fig_ops_bar(), config={"displayModeBar":False}), md=8),
-            dbc.Col(dcc.Graph(figure=fig_ops_pie(), config={"displayModeBar":False}), md=4),
-        ], className="mb-3 g-2"),
-        dbc.Row([
-            dbc.Col(dcc.Graph(figure=fig_sexo(),    config={"displayModeBar":False}), md=4),
-            dbc.Col(dcc.Graph(figure=fig_edad_hist(),config={"displayModeBar":False}),md=4),
-            dbc.Col(dcc.Graph(figure=fig_etareo(),  config={"displayModeBar":False}), md=4),
-        ], className="mb-3 g-2"),
-        dbc.Row([
-            dbc.Col(dcc.Graph(figure=fig_seg_social(),config={"displayModeBar":False}),md=4),
-            dbc.Col(dcc.Graph(figure=fig_edu(),     config={"displayModeBar":False}), md=4),
-            dbc.Col([
-                dcc.Graph(figure=fig_ano(), config={"displayModeBar":False}),
-                dcc.Graph(figure=fig_mes(), config={"displayModeBar":False}),
-            ], md=4),
-        ], className="mb-5 g-2"),
-    ]),
-
-    # ── SECCIÓN 4.2: BIVARIADO ──────────────────────────────────────────────
-    html.Section([
-        section_header(4, "Análisis Exploratorio — Sección 4.2: Bivariado",
-                       "Relaciones entre la causa de muerte y variables demográficas/socioeconómicas"),
-        ano_dropdown("biv"),
-        dbc.Row([
-            dbc.Col(dcc.Graph(id="biv-sexo",    config={"displayModeBar":False}), md=6),
-            dbc.Col(dcc.Graph(id="biv-etareo",  config={"displayModeBar":False}), md=6),
-        ], className="mb-3 g-2"),
-        dbc.Row([
-            dbc.Col(dcc.Graph(id="biv-temporal",config={"displayModeBar":False}), md=12),
-        ], className="mb-3 g-2"),
-        dbc.Row([
-            dbc.Col(dcc.Graph(id="biv-seg",     config={"displayModeBar":False}), md=6),
-            dbc.Col(dcc.Graph(id="biv-edu",     config={"displayModeBar":False}), md=6),
-        ], className="mb-3 g-2"),
-        dbc.Row([
-            dbc.Col(dcc.Graph(id="biv-comuna",  config={"displayModeBar":False}), md=12),
-        ], className="mb-5 g-2"),
-    ]),
-
-    # ── SECCIÓN 5: MODELADO ─────────────────────────────────────────────────
-    html.Section([
-        section_header(5, "Modelado Predictivo",
-                       "Random Forest y Árbol de Decisión — Clasificación del grupo OPS"),
-
-        # KPI Accuracy
-        dbc.Row([
-            dbc.Col(kpi_card(
-                "Accuracy — Random Forest",
-                f"{acc_rf*100:.1f}%","🌲","#2A9D8F"), md=3),
-            dbc.Col(kpi_card(
-                "Accuracy — Árbol de Decisión",
-                f"{acc_dt*100:.1f}%","🌿","#E9C46A"), md=3),
-            dbc.Col(kpi_card(
-                "Registros train",
-                f"{len(X_train):,}","📚","#457B9D"), md=3),
-            dbc.Col(kpi_card(
-                "Registros test",
-                f"{len(X_test):,}","🧪","#F4A261"), md=3),
-        ], className="mb-4 g-3"),
-
-        # Info de preparación
-        dbc.Card([dbc.CardBody([
-            html.H6("⚙️ Preparación de datos para modelado",
-                    style={"color":"#E9C46A"}),
-            dbc.Row([
-                dbc.Col([
-                    html.P("Features utilizadas:", style={"color":"#aaa","fontSize":"0.85rem","margin":"0"}),
-                    html.P(", ".join(FEATURE_COLS),
-                           style={"color":"#fff","fontSize":"0.88rem","fontFamily":"monospace"}),
-                ], md=6),
-                dbc.Col([
-                    html.P("Preprocesamiento:", style={"color":"#aaa","fontSize":"0.85rem","margin":"0"}),
-                    html.Ul([
-                        html.Li("EDAD_SIMPLE: imputación con mediana",
-                                style={"color":"#ccc","fontSize":"0.85rem"}),
-                        html.Li("Variables categóricas: OrdinalEncoder",
-                                style={"color":"#ccc","fontSize":"0.85rem"}),
-                        html.Li("División: 80% train / 20% test (stratified, seed=42)",
-                                style={"color":"#ccc","fontSize":"0.85rem"}),
-                    ]),
-                ], md=6),
-            ]),
-        ])], style={"background":"#16213e","border":"1px solid #333","borderRadius":"10px",
-                    "marginBottom":"20px"}),
-
-        # Matrices de confusión
-        dbc.Row([
-            dbc.Col(dcc.Graph(
-                figure=fig_confusion(y_test, y_pred_rf,
-                                     "Matriz de Confusión — Random Forest"),
-                config={"displayModeBar":False}), md=6),
-            dbc.Col(dcc.Graph(
-                figure=fig_confusion(y_test, y_pred_dt,
-                                     "Matriz de Confusión — Árbol de Decisión"),
-                config={"displayModeBar":False}), md=6),
-        ], className="mb-3 g-2"),
-
-        # Importancias + tabla comparativa
-        dbc.Row([
-            dbc.Col(dcc.Graph(figure=fig_importancias(),
-                              config={"displayModeBar":False}), md=5),
-            dbc.Col([
-                html.H6("📋 Reporte de clasificación comparativo",
-                        style={"color":"#fff","marginBottom":"10px"}),
-                dash_table.DataTable(
-                    data=df_cmp.to_dict("records"),
-                    columns=[{"name":c,"id":c} for c in df_cmp.columns],
-                    style_table={"overflowX":"auto"},
-                    style_cell={"backgroundColor":"#16213e","color":"#ccc",
-                                "border":"1px solid #333","fontSize":"12px",
-                                "textAlign":"center","padding":"6px"},
-                    style_header={"backgroundColor":"#1a1a2e","color":"#E63946",
-                                  "fontWeight":"bold","border":"1px solid #444"},
-                    style_data_conditional=[
-                        {"if":{"filter_query":"{RF F1} > 0.6"},
-                         "color":"#2A9D8F","fontWeight":"bold"},
-                    ],
-                    page_size=10,
-                )
-            ], md=7),
-        ], className="mb-5 g-2"),
-    ]),
-
-    # ── SECCIÓN 6: PREDICCIÓN ───────────────────────────────────────────────
-    html.Section([
-        section_header(6, "Predicción Interactiva",
-                       "Ingresa los datos de un individuo para predecir su grupo de causa de muerte"),
-        dbc.Row([
-            dbc.Col(dbc.Card([dbc.CardBody([
-                html.H6("📝 Datos del individuo", style={"color":"#E9C46A","fontWeight":"700"}),
-                html.Hr(style={"borderColor":"#333"}),
-
-                dbc.Row([
-                    dbc.Col([
-                        html.Label("Sexo", style={"color":"#aaa","fontSize":"0.85rem"}),
-                        dcc.Dropdown(id="pred-sexo",
-                            options=[{"label":v,"value":v} for v in ["Masculino","Femenino"]],
-                            value="Masculino", clearable=False,
-                            style={"marginBottom":"12px"}),
-                    ], md=6),
-                    dbc.Col([
-                        html.Label("Estado civil", style={"color":"#aaa","fontSize":"0.85rem"}),
-                        dcc.Dropdown(id="pred-civil",
-                            options=[{"label":v,"value":v} for v in
-                                     ["Casado/a","Soltero/a","Viudo/a","Unión libre","Separado/a","Sin info"]],
-                            value="Casado/a", clearable=False,
-                            style={"marginBottom":"12px"}),
-                    ], md=6),
-                ]),
-                dbc.Row([
-                    dbc.Col([
-                        html.Label(f"Edad: ", id="label-edad",
-                                   style={"color":"#aaa","fontSize":"0.85rem"}),
-                        dcc.Slider(id="pred-edad", min=0, max=110, step=1, value=65,
-                                   marks={0:"0",20:"20",40:"40",60:"60",80:"80",100:"100",110:"110"},
-                                   tooltip={"placement":"bottom","always_visible":True}),
-                    ], md=12),
-                ], className="mb-3"),
-                dbc.Row([
-                    dbc.Col([
-                        html.Label("Mes de fallecimiento", style={"color":"#aaa","fontSize":"0.85rem"}),
-                        dcc.Dropdown(id="pred-mes",
-                            options=[{"label":MESES_NOMBRES[m],"value":m} for m in range(1,13)],
-                            value=6, clearable=False,
-                            style={"marginBottom":"12px"}),
-                    ], md=6),
-                    dbc.Col([
-                        html.Label("Régimen de seguridad social",
-                                   style={"color":"#aaa","fontSize":"0.85rem"}),
-                        dcc.Dropdown(id="pred-seg",
-                            options=[{"label":v,"value":v} for v in
-                                     ["Contributivo","Subsidiado","Excepción","Vinculado","Particular","Sin info"]],
-                            value="Contributivo", clearable=False,
-                            style={"marginBottom":"12px"}),
-                    ], md=6),
-                ]),
-                dbc.Row([
-                    dbc.Col([
-                        html.Label("Nivel educativo", style={"color":"#aaa","fontSize":"0.85rem"}),
-                        dcc.Dropdown(id="pred-edu",
-                            options=[{"label":v,"value":v} for v in
-                                     ["Básica","Media","Técnico/Tecnológico","Superior","Sin info"]],
-                            value="Básica", clearable=False,
-                            style={"marginBottom":"12px"}),
-                    ], md=6),
-                    dbc.Col([
-                        html.Label("Comuna de residencia",
-                                   style={"color":"#aaa","fontSize":"0.85rem"}),
-                        dcc.Dropdown(id="pred-comuna",
-                            options=[{"label":v,"value":v}
-                                     for v in sorted(df["COMUNA_RES"].unique())],
-                            value=sorted(df["COMUNA_RES"].unique())[0],
-                            clearable=False,
-                            style={"marginBottom":"12px"}),
-                    ], md=6),
-                ]),
-                html.Hr(style={"borderColor":"#333"}),
-                html.Label("Modelo a utilizar", style={"color":"#aaa","fontSize":"0.85rem"}),
-                dbc.RadioItems(
-                    id="pred-modelo",
-                    options=[
-                        {"label":" Random Forest","value":"rf"},
-                        {"label":" Árbol de Decisión","value":"dt"},
-                    ],
-                    value="rf", inline=True,
-                    style={"color":"#fff","marginBottom":"16px"},
-                ),
-                dbc.Button("🔮 Predecir causa de muerte", id="btn-predecir",
-                           color="danger", size="lg", className="w-100"),
-            ])],
-            style={"background":"#16213e","border":"1px solid #E9C46A",
-                   "borderRadius":"12px","height":"100%"}),
-            md=5),
-
-            dbc.Col([
-                html.Div(id="pred-resultado"),
-                html.Div(id="pred-probabilidades"),
-            ], md=7),
-        ], className="mb-5 g-3"),
-    ]),
-
-    html.Footer([
-        html.Hr(style={"borderColor":"#333"}),
-        html.P("Dashboard de Mortalidad — Medellín 2012–2021 | Camilo González & Rubén Esguerra",
-               style={"textAlign":"center","color":"#555","fontSize":"0.8rem","padding":"10px"}),
-    ]),
-
-], fluid=True, style={"background":"#0f0f1a","minHeight":"100vh","padding":"0 20px"})
-
-# =============================================================================
-# 8. CALLBACKS
-# =============================================================================
-
-@app.callback(
-    Output("biv-sexo",    "figure"),
-    Output("biv-etareo",  "figure"),
-    Output("biv-temporal","figure"),
-    Output("biv-seg",     "figure"),
-    Output("biv-edu",     "figure"),
-    Output("biv-comuna",  "figure"),
-    Input("ano-filter-biv","value"),
-)
-def update_bivariados(ano):
-    ano_val = None if ano == "todos" else int(ano)
-    return (
-        fig_biv_sexo(ano_val),
-        fig_biv_etareo(ano_val),
-        fig_biv_temporal(ano_val),
-        fig_biv_seg(ano_val),
-        fig_biv_edu(ano_val),
-        fig_biv_comuna(ano_val),
+# ---------- Sidebar ----------
+def make_nav_btn(icon, label, section_id, active=False):
+    return dbc.Button(
+        [
+            html.I(className=f"bi {icon}", style={"marginRight": "8px"}),
+            label
+        ],
+        id=f"btn-{section_id}",
+        n_clicks=0,
+        style={
+            "width": "100%",
+            "textAlign": "left",
+            "marginBottom": "6px",
+            "padding": "10px",
+            "backgroundColor": "#1A2D45" if active else "#1A2535",
+            "color": "#00D4FF" if active else "#E0E6ED",
+            "border": "none",
+            "borderRadius": "6px",
+            "cursor": "pointer"
+        }
     )
 
+sidebar = html.Div([
 
+    html.Div([
+        html.Div("📊", style={"fontSize": "2rem"}),
+        html.Div([
+            html.H6("Mortalidad", style={
+                "margin": "0",
+                "fontWeight": "bold",
+                "color": "#00D4FF"
+            }),
+            html.Small("Medellín 2012–2021", style={
+                "color": "#8892A0",
+                "fontSize": "0.7rem"
+            }),
+        ])
+    ], style={
+        "display": "flex",
+        "alignItems": "center",
+        "gap": "10px",
+        "marginBottom": "20px"
+    }),
+
+    html.Hr(style={"borderColor": "#2A3545"}),
+
+    html.Div([
+        make_nav_btn("bi-info-circle", "Introducción", "intro", True),
+        make_nav_btn("bi-question-circle", "Problema", "problema"),
+        make_nav_btn("bi-bullseye", "Objetivos", "objetivos"),
+        make_nav_btn("bi-bar-chart", "Univariado", "univariado"),
+        make_nav_btn("bi-graph-up", "Bivariado", "bivariado"),
+        make_nav_btn("bi-cpu", "Modelado", "modelo"),
+    ]),
+
+    html.Hr(style={"borderColor": "#2A3545"}),
+
+    html.Div([
+        html.Small("Dataset: 145,377 registros", style={"color": "#8892A0", "display": "block"}),
+        html.Small("Variables: 11 columnas", style={"color": "#8892A0", "display": "block"}),
+    ])
+
+], style={
+    "position": "fixed",
+    "top": "0",
+    "left": "0",
+    "height": "100vh",
+    "width": "220px",
+    "backgroundColor": "#0D1521",
+    "padding": "20px",
+    "borderRight": "1px solid #1E2D40"
+})
+
+# ---------- Secciones ----------
+
+def section_intro():
+    kpis = [
+        ("145,377", "Registros totales",  "bi-database",        "#00D4FF"),
+        ("10 años", "Período analizado",  "bi-calendar-range",  "#2A9D8F"),
+        ("7 grupos","Categorías OPS",      "bi-diagram-3",       "#E63946"),
+        ("11",      "Variables",          "bi-table",           "#E9C46A"),
+    ]
+    kpi_cards = dbc.Row([
+        dbc.Col(dbc.Card([
+            dbc.CardBody([
+                html.I(className=f"bi {icon} fs-3 mb-2", style={"color": color}),
+                html.H3(val, className="fw-bold mb-0", style={"color": color}),
+                html.Small(label, style={"color":"#8892A0"}),
+            ], className="text-center py-3")
+        ], className="stat-card"), width=6, md=3, className="mb-3")
+        for val, label, icon, color in kpis
+    ], className="mb-4")
+
+    vars_table = dbc.Table([
+        html.Thead(html.Tr([html.Th("Variable"), html.Th("Tipo"), html.Th("Descripción")])),
+        html.Tbody([
+            html.Tr([html.Td("NOM_667_OPS_GRUPO"), html.Td(dbc.Badge("Objetivo", color="danger")),  html.Td("Grupo de causa de muerte (7 categorías)")]),
+            html.Tr([html.Td("ANO / MES"),          html.Td(dbc.Badge("Temporal", color="info")),   html.Td("Año (2012–2021) y mes de fallecimiento")]),
+            html.Tr([html.Td("SEXO"),               html.Td(dbc.Badge("Demog.", color="success")),  html.Td("Masculino / Femenino / Indeterminado")]),
+            html.Tr([html.Td("EDAD_SIMPLE"),        html.Td(dbc.Badge("Numérica", color="warning")),html.Td("Edad en años al momento del fallecimiento")]),
+            html.Tr([html.Td("ETAREO_QUIN"),        html.Td(dbc.Badge("Categ.", color="secondary")),html.Td("Grupo etario quinquenal")]),
+            html.Tr([html.Td("EST_CIVIL"),          html.Td(dbc.Badge("Categ.", color="secondary")),html.Td("Estado civil del fallecido")]),
+            html.Tr([html.Td("SEG_SOCIAL"),         html.Td(dbc.Badge("Categ.", color="secondary")),html.Td("Régimen de seguridad social")]),
+            html.Tr([html.Td("NIVEL_EDU_GRUPO"),    html.Td(dbc.Badge("Categ.", color="secondary")),html.Td("Nivel educativo agrupado")]),
+            html.Tr([html.Td("COMUNA_RES"),         html.Td(dbc.Badge("Geog.", color="primary")),   html.Td("Comuna de residencia (22 comunas)")]),
+        ])
+    ], striped=True, hover=True, size="sm", className="table-dark")
+
+    return html.Div([
+        html.H2("Introducción", className="section-title"),
+        dbc.Alert([
+            html.H5("🏥 Contexto del problema", className="mb-2"),
+            html.P(
+                "La mortalidad urbana es un indicador clave del estado de salud pública de una ciudad. "
+                "Medellín, con más de 2.5 millones de habitantes, registra anualmente decenas de miles de "
+                "defunciones clasificadas según la Organización Panamericana de la Salud (OPS). Comprender "
+                "qué variables demográficas, socioeconómicas y temporales se asocian con cada tipo de causa "
+                "de muerte permite diseñar políticas de salud más focalizadas y eficientes.",
+                className="mb-1"
+            ),
+            html.P(
+                "Este análisis explora datos del Sistema de Estadísticas Vitales de Medellín (2012–2021), "
+                "aplicando técnicas de análisis exploratorio y modelos de machine learning para predecir "
+                "el grupo OPS de una defunción a partir de características del individuo.",
+                className="mb-0"
+            ),
+        ], color="dark", className="border border-secondary mb-4"),
+        kpi_cards,
+        html.H5("📋 Descripción del Dataset", className="mb-3"),
+        vars_table,
+    ])
+
+
+def section_problema():
+    return html.Div([
+        html.H2("Problema de Análisis", className="section-title"),
+        dbc.Card(dbc.CardBody([
+            html.H5("❓ Pregunta central", className="text-info mb-3"),
+            html.Blockquote(
+                "¿Qué factores demográficos, socioeconómicos y temporales determinan "
+                "el grupo de causa de muerte (NOM_667_OPS_GRUPO) de una defunción registrada en Medellín?",
+                className="blockquote fs-5 border-start border-danger ps-3"
+            ),
+        ]), className="mb-4 stat-card"),
+        dbc.Row([
+            dbc.Col(dbc.Card(dbc.CardBody([
+                html.H6("📌 Sub-preguntas analíticas", className="text-warning mb-3"),
+                html.Ul([
+                    html.Li("¿Cómo varía la distribución de causas de muerte según sexo y edad?"),
+                    html.Li("¿Existen diferencias en las causas de muerte según el régimen de seguridad social o nivel educativo?"),
+                    html.Li("¿Ha cambiado la proporción de causas de muerte a lo largo del tiempo (2012–2021)?"),
+                    html.Li("¿Es posible predecir el grupo OPS con variables disponibles en el registro de defunción?"),
+                ], className="mb-0")
+            ]), className="stat-card"), md=6),
+            dbc.Col(dbc.Card(dbc.CardBody([
+                html.H6("⚠️ Relevancia del problema", className="text-danger mb-3"),
+                html.Ul([
+                    html.Li("Las enfermedades circulatorias y neoplasias representan más del 50% de las muertes."),
+                    html.Li("La mortalidad por causas externas afecta desproporcionadamente a hombres jóvenes."),
+                    html.Li("El régimen de seguridad social puede reflejar desigualdades en acceso a salud."),
+                    html.Li("Modelos predictivos pueden apoyar sistemas de alerta temprana en salud pública."),
+                ], className="mb-0")
+            ]), className="stat-card"), md=6),
+        ])
+    ])
+
+
+def section_objetivos():
+    esp = [
+        ("bi-1-circle", "#00D4FF", "Caracterizar la distribución de causas de muerte según grupos OPS en Medellín."),
+        ("bi-2-circle", "#2A9D8F", "Explorar relaciones entre causas de muerte y variables demográficas (sexo, edad, estado civil)."),
+        ("bi-3-circle", "#E9C46A", "Analizar el comportamiento temporal de la mortalidad entre 2012 y 2021."),
+        ("bi-4-circle", "#F4A261", "Comparar el desempeño predictivo de Random Forest y Árbol de Decisión."),
+        ("bi-5-circle", "#E63946", "Construir una herramienta interactiva de predicción del grupo OPS."),
+    ]
+    return html.Div([
+        html.H2("Objetivos", className="section-title"),
+        dbc.Card(dbc.CardBody([
+            html.H5("🎯 Objetivo General", className="text-info mb-2"),
+            html.P(
+                "Desarrollar un dashboard analítico-predictivo que permita explorar los patrones de mortalidad "
+                "en Medellín e implementar modelos de clasificación capaces de predecir el grupo OPS de una "
+                "defunción a partir de variables demográficas y socioeconómicas disponibles en el registro.",
+                className="mb-0 fs-5"
+            ),
+        ]), className="stat-card mb-4"),
+        html.H5("📌 Objetivos Específicos", className="mb-3"),
+        dbc.Row([
+            dbc.Col(dbc.Card(dbc.CardBody([
+                html.Div([
+                    html.I(className=f"bi {icon} fs-2 me-3", style={"color": color}),
+                    html.P(desc, className="mb-0"),
+                ], className="d-flex align-items-center")
+            ]), className="stat-card mb-3"), md=6)
+            for icon, color, desc in esp
+        ])
+    ])
+
+
+def section_univariado():
+    return html.Div([
+        html.H2("Análisis Univariado", className="section-title"),
+        html.P("Distribución individual de las variables más relevantes del dataset.", className="text-muted mb-4"),
+
+        dbc.Row([
+            dbc.Col([
+                dbc.Card(dbc.CardBody([
+                    dcc.Graph(figure=fig_ops_dist(), config={"displayModeBar": False}),
+                ]), className="stat-card"),
+            ], md=12, className="mb-4"),
+        ]),
+
+        dbc.Row([
+            dbc.Col(dbc.Card(dbc.CardBody([
+                dcc.Graph(figure=fig_sexo(), config={"displayModeBar": False}),
+            ]), className="stat-card"), md=6, className="mb-4"),
+            dbc.Col(dbc.Card(dbc.CardBody([
+                dcc.Graph(figure=fig_edad(), config={"displayModeBar": False}),
+            ]), className="stat-card"), md=6, className="mb-4"),
+        ]),
+
+        dbc.Row([
+            dbc.Col(dbc.Card(dbc.CardBody([
+                dcc.Graph(figure=fig_seg_social(), config={"displayModeBar": False}),
+            ]), className="stat-card"), md=6, className="mb-4"),
+            dbc.Col(dbc.Card(dbc.CardBody([
+                dcc.Graph(figure=fig_edu(), config={"displayModeBar": False}),
+            ]), className="stat-card"), md=6, className="mb-4"),
+        ]),
+
+        dbc.Row([
+            dbc.Col(dbc.Card(dbc.CardBody([
+                dcc.Graph(figure=fig_anual(), config={"displayModeBar": False}),
+            ]), className="stat-card"), md=12, className="mb-4"),
+        ]),
+    ])
+
+
+def section_bivariado():
+    return html.Div([
+        html.H2("Análisis Bivariado", className="section-title"),
+        html.P("Relaciones entre la variable objetivo (Grupo OPS) y las demás variables del dataset.", className="text-muted mb-4"),
+
+        dbc.Row([
+            dbc.Col(dbc.Card(dbc.CardBody([
+                dcc.Graph(figure=fig_ops_sexo(), config={"displayModeBar": False}),
+            ]), className="stat-card"), md=6, className="mb-4"),
+            dbc.Col(dbc.Card(dbc.CardBody([
+                dcc.Graph(figure=fig_ops_edad(), config={"displayModeBar": False}),
+            ]), className="stat-card"), md=6, className="mb-4"),
+        ]),
+
+        dbc.Row([
+            dbc.Col(dbc.Card(dbc.CardBody([
+                dcc.Graph(figure=fig_ops_anual(), config={"displayModeBar": False}),
+            ]), className="stat-card"), md=12, className="mb-4"),
+        ]),
+
+        dbc.Row([
+            dbc.Col(dbc.Card(dbc.CardBody([
+                dcc.Graph(figure=fig_ops_seg(), config={"displayModeBar": False}),
+            ]), className="stat-card"), md=6, className="mb-4"),
+            dbc.Col(dbc.Card(dbc.CardBody([
+                dcc.Graph(figure=fig_heatmap_edad_ops(), config={"displayModeBar": False}),
+            ]), className="stat-card"), md=6, className="mb-4"),
+        ]),
+    ])
+
+
+def section_modelo():
+    # Tabla de métricas
+    metric_rows = []
+    for _, row in metrics_df.iterrows():
+        best_acc = metrics_df["Accuracy"].max()
+        metric_rows.append(html.Tr([
+            html.Td(row["Modelo"]),
+            html.Td(f"{row['Accuracy']}%",  style={"color":"#00D4FF" if row["Accuracy"] == best_acc else "inherit", "fontWeight":"bold" if row["Accuracy"] == best_acc else "normal"}),
+            html.Td(f"{row['Precision']}%"),
+            html.Td(f"{row['Recall']}%"),
+            html.Td(f"{row['F1-Score']}%"),
+        ]))
+
+    metrics_table = dbc.Table([
+        html.Thead(html.Tr([html.Th(c) for c in ["Modelo","Accuracy","Precision","Recall","F1-Score"]])),
+        html.Tbody(metric_rows)
+    ], striped=True, hover=True, size="sm", className="table-dark")
+
+    # Opciones de dropdowns para predicción
+    def mk_select(id_, opts, placeholder):
+        return dcc.Dropdown(
+            id=id_, options=[{"label": o, "value": o} for o in opts],
+            placeholder=placeholder, clearable=False, className="mb-3 dropdown-dark"
+        )
+
+    return html.Div([
+        html.H2("Modelado Predictivo", className="section-title"),
+
+        # Sub-sección: pipeline
+        dbc.Alert([
+            html.H6("⚙️ Pipeline de Modelado", className="mb-2 text-info"),
+            html.Ul([
+                html.Li("Features: SEXO, EDAD_SIMPLE, EST_CIVIL, SEG_SOCIAL, NIVEL_EDU_GRUPO, ANO, MES"),
+                html.Li("Codificación: LabelEncoder para variables categóricas"),
+                html.Li("División: 80% Train / 20% Test (stratify=y, random_state=42)"),
+                html.Li("Modelos: RandomForestClassifier (100 árboles, max_depth=10) y DecisionTreeClassifier (max_depth=8)"),
+            ], className="mb-0"),
+        ], color="dark", className="border border-info mb-4"),
+
+        # Métricas
+        html.H5("📊 Comparación de Modelos", className="mb-3"),
+        dbc.Card(dbc.CardBody(metrics_table), className="stat-card mb-4"),
+
+        # Gráficos de evaluación
+        dbc.Row([
+            dbc.Col([
+                html.Label("Seleccionar modelo:", className="text-muted mb-1"),
+                dcc.Dropdown(
+                    id="dd-model-cm",
+                    options=[
+                        {"label":"Random Forest",    "value":"Random Forest"},
+                        {"label":"Árbol de Decisión","value":"Árbol de Decisión"},
+                    ],
+                    value="Random Forest", clearable=False, className="mb-3 dropdown-dark"
+                ),
+                dbc.Card(dbc.CardBody([
+                    dcc.Graph(id="graph-cm", config={"displayModeBar": False}),
+                ]), className="stat-card"),
+            ], md=7, className="mb-4"),
+
+            dbc.Col([
+                dbc.Card(dbc.CardBody([
+                    dcc.Graph(figure=fig_feat_imp(), config={"displayModeBar": False}),
+                ]), className="stat-card"),
+            ], md=5, className="mb-4"),
+        ]),
+
+        html.Hr(className="border-secondary my-4"),
+
+        # ---- Predicción interactiva ----
+        html.H4("🎯 Predicción Interactiva", className="mb-1 text-info"),
+        html.P("Ingresa los valores del individuo y obtén la predicción del Grupo OPS.", className="text-muted mb-4"),
+
+        dbc.Card(dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    html.Label("Modelo a usar:", className="fw-bold mb-1"),
+                    dcc.RadioItems(
+                        id="pred-modelo",
+                        options=[
+                            {"label":"  Random Forest",    "value":"rf"},
+                            {"label":"  Árbol de Decisión","value":"dt"},
+                        ],
+                        value="rf", inline=True, className="mb-3",
+                        inputStyle={"marginRight":"6px"},
+                        labelStyle={"marginRight":"20px"},
+                    ),
+                ], md=12),
+
+                dbc.Col([
+                    html.Label("Sexo", className="text-muted small"),
+                    mk_select("pred-sexo", ["Masculino","Femenino","Indeterminado"], "Seleccionar…"),
+                    html.Label("Estado Civil", className="text-muted small"),
+                    mk_select("pred-estcivil", ["Soltero/a","Casado/a","Viudo/a","Unión libre","Separado/a","Sin info"], "Seleccionar…"),
+                    html.Label("Seguridad Social", className="text-muted small"),
+                    mk_select("pred-segsocial", ["Contributivo","Subsidiado","Excepción","Particular","Vinculado","Sin info"], "Seleccionar…"),
+                ], md=4),
+
+                dbc.Col([
+                    html.Label("Nivel Educativo", className="text-muted small"),
+                    mk_select("pred-edu", ["Básica","Media","Técnico/Tecnológico","Superior","Sin info"], "Seleccionar…"),
+                    html.Label(f"Edad: ", className="text-muted small", id="lbl-edad"),
+                    dcc.Slider(id="pred-edad", min=0, max=110, step=1, value=68,
+                               marks={0:"0", 20:"20", 40:"40", 60:"60", 80:"80", 110:"110"},
+                               tooltip={"placement":"bottom","always_visible":True},
+                               className="mb-3"),
+                    html.Label("Año de defunción", className="text-muted small"),
+                    dcc.Slider(id="pred-ano", min=2012, max=2021, step=1, value=2019,
+                               marks={y: str(y) for y in range(2012, 2022, 2)},
+                               tooltip={"placement":"bottom","always_visible":True},
+                               className="mb-3"),
+                ], md=4),
+
+                dbc.Col([
+                    html.Label("Mes", className="text-muted small"),
+                    dcc.Slider(id="pred-mes", min=1, max=12, step=1, value=6,
+                               marks={1:"Ene",3:"Mar",6:"Jun",9:"Sep",12:"Dic"},
+                               tooltip={"placement":"bottom","always_visible":True},
+                               className="mb-3"),
+                    html.Br(),
+                    dbc.Button(
+                        [html.I(className="bi bi-lightning-charge-fill me-2"), "Predecir"],
+                        id="btn-predecir", color="danger", size="lg",
+                        className="w-100 mt-2 fw-bold"
+                    ),
+                ], md=4),
+            ]),
+
+            html.Div(id="pred-output", className="mt-4"),
+        ]), className="stat-card mb-4"),
+    ])
+
+
+# ---------- Layout principal ----------
+app.layout = html.Div([
+
+    dcc.Store(id="active-section", data="intro"),
+
+    sidebar,
+
+    html.Div(
+        id="page-content",
+        children=[],
+        style={
+            "marginLeft": "220px",
+            "padding": "32px",
+            "minHeight": "100vh",
+            "backgroundColor": "#0A0F1A",
+            "color": "#E0E6ED",
+            "fontFamily": "Arial, sans-serif"
+        }
+    ),
+
+], style={
+    "backgroundColor": "#0A0F1A",
+    "minHeight": "100vh"
+})
+
+
+# =============================================================================
+# 5. CALLBACKS
+# =============================================================================
+
+SECTIONS = ["intro", "problema", "objetivos", "univariado", "bivariado", "modelo"]
+SECTION_FN = {
+    "intro":       section_intro,
+    "problema":    section_problema,
+    "objetivos":   section_objetivos,
+    "univariado":  section_univariado,
+    "bivariado":   section_bivariado,
+    "modelo":      section_modelo,
+}
+
+# Navegación: actualizar sección activa
 @app.callback(
-    Output("pred-resultado",      "children"),
-    Output("pred-probabilidades", "children"),
-    Input("btn-predecir","n_clicks"),
-    State("pred-sexo",   "value"),
-    State("pred-edad",   "value"),
-    State("pred-mes",    "value"),
-    State("pred-civil",  "value"),
-    State("pred-seg",    "value"),
-    State("pred-edu",    "value"),
-    State("pred-comuna", "value"),
-    State("pred-modelo", "value"),
+    Output("active-section", "data"),
+    [Input(f"btn-{s}", "n_clicks") for s in SECTIONS],
     prevent_initial_call=True,
 )
-def predecir(n, sexo, edad, mes, civil, seg, edu, comuna, modelo):
-    # Construir fila con encoder
-    row = pd.DataFrame([{
-        "SEXO": sexo,
-        "EDAD_SIMPLE": float(edad),
-        "MES": int(mes),
-        "EST_CIVIL": civil,
-        "SEG_SOCIAL": seg,
-        "NIVEL_EDU_GRUPO": edu,
-        "COMUNA_RES": comuna,
-    }])
-    row[cat_cols] = enc.transform(row[cat_cols])
+def update_active(*args):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        return "intro"
+    btn_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    return btn_id.replace("btn-", "")
 
-    mdl = rf if modelo == "rf" else dt
-    pred_label = mdl.predict(row)[0]
-    probs = mdl.predict_proba(row)[0]
-    mdl_name = "Random Forest" if modelo == "rf" else "Árbol de Decisión"
-    color = OPS_COLORS.get(pred_label, "#E63946")
+# Renderizar contenido de sección
+@app.callback(
+    Output("page-content", "children"),
+    Input("active-section", "data"),
+)
+def render_section(section):
+    return SECTION_FN.get(section, section_intro)()
 
-    result_card = dbc.Card([dbc.CardBody([
-        html.H6(f"Resultado — {mdl_name}",
-                style={"color":"#aaa","fontWeight":"400","fontSize":"0.85rem"}),
-        html.H4("Grupo OPS predicho:", style={"color":"#fff","marginTop":"10px"}),
-        html.H3(pred_label,
-                style={"color":color,"fontWeight":"800",
-                       "borderLeft":f"5px solid {color}","paddingLeft":"12px",
-                       "margin":"10px 0 20px 0"}),
-        html.Small("⚠️ Esta predicción es orientativa. No reemplaza criterio médico.",
-                   style={"color":"#666"}),
-    ])], style={"background":"#16213e","border":f"2px solid {color}",
-                "borderRadius":"12px","marginBottom":"16px"})
+# Actualizar estilos de botones activos
+@app.callback(
+    [Output(f"btn-{s}", "className") for s in SECTIONS],
+    Input("active-section", "data"),
+)
+def update_nav_styles(active):
+    return [
+        f"nav-btn btn btn-link {'nav-btn-active' if s == active else ''}"
+        for s in SECTIONS
+    ]
 
-    # Gráfico de probabilidades
-    prob_df = pd.DataFrame({
-        "Grupo": mdl.classes_,
-        "Probabilidad": probs * 100
-    }).sort_values("Probabilidad", ascending=True)
-    prob_df["Color"] = prob_df["Grupo"].map(OPS_COLORS)
+# Matriz de confusión dinámica
+@app.callback(
+    Output("graph-cm", "figure"),
+    Input("dd-model-cm", "value"),
+)
+def update_cm(model_name):
+    return fig_conf_matrix(model_name)
 
-    fig_prob = px.bar(
-        prob_df, x="Probabilidad", y="Grupo", orientation="h",
-        color="Grupo", color_discrete_map=OPS_COLORS,
-        text=prob_df["Probabilidad"].map(lambda x: f"{x:.1f}%"),
-        title="Probabilidades por grupo OPS",
-        template="plotly_dark",
+# Predicción interactiva
+@app.callback(
+    Output("pred-output", "children"),
+    Input("btn-predecir", "n_clicks"),
+    State("pred-modelo",   "value"),
+    State("pred-sexo",     "value"),
+    State("pred-estcivil", "value"),
+    State("pred-segsocial","value"),
+    State("pred-edu",      "value"),
+    State("pred-edad",     "value"),
+    State("pred-ano",      "value"),
+    State("pred-mes",      "value"),
+    prevent_initial_call=True,
+)
+def predict(n, modelo, sexo, estcivil, segsocial, edu, edad, ano, mes):
+    if None in [sexo, estcivil, segsocial, edu]:
+        return dbc.Alert("⚠️ Por favor completa todos los campos.", color="warning")
+
+    # Construir fila de predicción
+    row = {
+        "SEXO":           sexo,
+        "EDAD_SIMPLE":    float(edad),
+        "EST_CIVIL":      estcivil,
+        "SEG_SOCIAL":     segsocial,
+        "NIVEL_EDU_GRUPO":edu,
+        "ANO":            int(ano),
+        "MES":            int(mes),
+    }
+    df_pred = pd.DataFrame([row])
+
+    # Codificar categorías con los mismos encoders del entrenamiento
+    for col in CAT_FEATURES:
+        le = encoders[col]
+        val = df_pred[col].astype(str).iloc[0]
+        if val in le.classes_:
+            df_pred[col] = le.transform([val])
+        else:
+            df_pred[col] = 0
+
+    X_new = df_pred[FEATURES]
+
+    model = rf_model if modelo == "rf" else dt_model
+
+    pred_class = model.predict(X_new)[0]
+    pred_label = le_target.inverse_transform([pred_class])[0]
+
+    # Probabilidades
+    proba = model.predict_proba(X_new)[0]
+    classes = le_target.inverse_transform(np.arange(len(proba)))
+    proba_df = pd.DataFrame({"Grupo OPS": classes, "Probabilidad": proba}).sort_values("Probabilidad", ascending=True)
+
+    color = OPS_COLORS.get(pred_label, "#00D4FF")
+
+    fig_proba = px.bar(
+        proba_df, x="Probabilidad", y="Grupo OPS", orientation="h",
+        color="Probabilidad", color_continuous_scale="Teal",
+        title="Probabilidades por clase"
     )
-    fig_prob.update_traces(textposition="outside")
-    fig_prob.update_layout(
-        showlegend=False,
-        margin=dict(l=10, r=60, t=50, b=10),
-        height=380,
-        xaxis_title="Probabilidad (%)",
-        yaxis_title="",
-    )
-    fig_pred_card = dcc.Graph(figure=fig_prob, config={"displayModeBar": False})
+    fig_proba.update_layout(**LAYOUT_BASE, height=320, showlegend=False)
+    fig_proba.update_xaxes(tickformat=".0%")
 
-    return result_card, fig_pred_card
+    return dbc.Row([
+        dbc.Col(dbc.Card(dbc.CardBody([
+            html.P("Predicción del Grupo OPS", className="text-muted mb-1 small"),
+            html.H3(pred_label, style={"color": color, "fontWeight":"700"}),
+            html.Hr(style={"borderColor": color}),
+            html.Small(f"Modelo: {'Random Forest' if modelo=='rf' else 'Árbol de Decisión'}", className="text-muted"),
+            html.Br(),
+            html.Small(f"Confianza: {proba.max()*100:.1f}%", style={"color": color}),
+        ]), className="stat-card pred-result-card h-100"), md=5),
+        dbc.Col(dbc.Card(dbc.CardBody([
+            dcc.Graph(figure=fig_proba, config={"displayModeBar": False}),
+        ]), className="stat-card"), md=7),
+    ])
 
 
 # =============================================================================
-# 9. RUN
+# 6. MAIN
 # =============================================================================
 
 if __name__ == "__main__":
