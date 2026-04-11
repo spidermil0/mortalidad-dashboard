@@ -111,7 +111,7 @@ Abre tu navegador en: **http://localhost:8050**
 
 ---
 
-## 🐳 Instrucciones para Ejecutar en Local
+## 🐳 Instrucciones para Ejecutar en Local (Docker)
 
 ### 1. Verificar instalación de Docker
 
@@ -146,27 +146,30 @@ Ctrl + C
 
 ## ☁️ Despliegue en Render
 
-El proyecto está configurado para ser desplegado en la plataforma Render como servicio web.
+El proyecto está desplegado como servicio web en la plataforma **Render**, lo que permite acceder al dashboard de forma pública sin necesidad de ejecución local.
 
-### Configuración del servicio
+### ⚙️ Configuración del servicio
 
-En el panel de Render, crear un nuevo Web Service a partir del repositorio de GitHub y configurar:
+El despliegue se realiza directamente desde el repositorio de GitHub, utilizando **Docker** como entorno de ejecución.
 
-Branch: main
-Environment: Docker
-Build Method: Dockerfile
-Start Command: automático desde Dockerfile
-Actualización del despliegue
+### Configuración utilizada:
 
-Cada cambio realizado en la rama main del repositorio activa automáticamente un redeploy en Render. En caso de no reflejar cambios recientes, se puede ejecutar un despliegue manual desde el panel del servicio.
+- **Branch:** main  
+- **Environment:** Docker  
+- **Build Method:** Dockerfile  
+- **Start Command:** definido automáticamente por el Dockerfile  
 
-### Acceso a la aplicación
+---
 
-Una vez desplegado, Render generará una URL pública del tipo:
+### 🔄 Actualización del despliegue
 
-https://nombre-del-servicio.onrender.com
+Cada cambio realizado en la rama **main** del repositorio activa automáticamente un nuevo despliegue en Render.
 
-Esta URL permite acceder al dashboard sin necesidad de ejecutar el proyecto localmente.
+En caso de que los cambios recientes no se reflejen, se puede ejecutar un **redeploy manual** desde el panel del servicio.
+
+### 🌐 Acceso a la aplicación
+
+🔗 **Link del dashboard:** https://mortalidad-dashboard-pr0q.onrender.com/
 
 ---
 
