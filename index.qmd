@@ -1,9 +1,9 @@
-# Análisis Exploratorio de Datos de Mortalidad
+---
+title: "Mortalidad en Medellín"
+---
 
-Este proyecto presenta un análisis exploratorio de datos (EDA) enfocado en comprender patrones de mortalidad a partir del dataset proporcionado.
+# Introducción
 
-## Contenido
+Este proyecto presenta un análisis exploratorio de datos (EDA) sobre la mortalidad en Medellín entre 2012 y 2023.
 
-- Análisis exploratorio completo
-- Limpieza y tratamiento de datos
-- Visualización de variables relevantes
+Usa el menú lateral para navegar.

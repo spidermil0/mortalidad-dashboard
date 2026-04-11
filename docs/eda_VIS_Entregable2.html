@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Introducción – Análisis de Mortalidad</title>
+<title>Análisis Exploratorio de Datos (EDA) sobre Mortalidad en Medellín (2012-2023) – Mortalidad en Medellín</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -68,6 +68,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./index.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -77,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-a0f9fd0d421825b736dc1bbcbcba2219.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ffc4c3fc79587ee79da4865b6a08975e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -121,7 +122,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./eda_VIS_Entregable2_web.html">Introducción</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./eda_VIS_Entregable2.html"><span class="chapter-title">Análisis Exploratorio de Datos (EDA) sobre Mortalidad en Medellín (2012-2023)</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -134,9 +135,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="./logo.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="./logo.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      </a>
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Análisis de Mortalidad</a> 
+      <a href="./">Mortalidad en Medellín</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -148,14 +153,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Análisis Exploratorio de Datos (EDA) sobre Mortalidad en Medellín (2012-2023)</span></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mortalidad en Medellín</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./eda_VIS_Entregable2_web.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Introducción</span></a>
+  <a href="./eda_VIS_Entregable2.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Análisis Exploratorio de Datos (EDA) sobre Mortalidad en Medellín (2012-2023)</span></a>
   </div>
 </li>
     </ul>
@@ -164,11 +167,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">Contenido</h2>
    
   <ul>
-  <li><a href="#problema" id="toc-problema" class="nav-link active" data-scroll-target="#problema">Problema</a></li>
+  <li><a href="#introducción" id="toc-introducción" class="nav-link active" data-scroll-target="#introducción">Introducción</a></li>
+  <li><a href="#problema" id="toc-problema" class="nav-link" data-scroll-target="#problema">Problema</a></li>
   <li><a href="#objetivo" id="toc-objetivo" class="nav-link" data-scroll-target="#objetivo">Objetivo</a></li>
   <li><a href="#descripción-del-dataset" id="toc-descripción-del-dataset" class="nav-link" data-scroll-target="#descripción-del-dataset">Descripción del Dataset</a></li>
   <li><a href="#carga-y-vista-preeliminar-del-dataset" id="toc-carga-y-vista-preeliminar-del-dataset" class="nav-link" data-scroll-target="#carga-y-vista-preeliminar-del-dataset">Carga y vista preeliminar del dataset</a></li>
@@ -179,7 +183,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#selección-de-variables-para-el-análisis" id="toc-selección-de-variables-para-el-análisis" class="nav-link" data-scroll-target="#selección-de-variables-para-el-análisis">Selección de variables para el análisis</a></li>
   <li><a href="#variables-descartadas" id="toc-variables-descartadas" class="nav-link" data-scroll-target="#variables-descartadas">Variables descartadas</a></li>
   <li><a href="#variables-seleccionadas-para-el-análisis" id="toc-variables-seleccionadas-para-el-análisis" class="nav-link" data-scroll-target="#variables-seleccionadas-para-el-análisis">Variables seleccionadas para el análisis</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#descartar-columnas-irrelevantes" id="toc-descartar-columnas-irrelevantes" class="nav-link" data-scroll-target="#descartar-columnas-irrelevantes">Descartar columnas irrelevantes</a></li>
   <li><a href="#tratamiento-de-la-variable-etareo_quin" id="toc-tratamiento-de-la-variable-etareo_quin" class="nav-link" data-scroll-target="#tratamiento-de-la-variable-etareo_quin">Tratamiento de la variable <code>ETAREO_QUIN</code></a></li>
   <li><a href="#tratamiento-de-la-variable-edad_simple" id="toc-tratamiento-de-la-variable-edad_simple" class="nav-link" data-scroll-target="#tratamiento-de-la-variable-edad_simple">Tratamiento de la variable <code>EDAD_SIMPLE</code></a></li>
@@ -189,15 +193,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#ajustes-finales-del-dataset" id="toc-ajustes-finales-del-dataset" class="nav-link" data-scroll-target="#ajustes-finales-del-dataset">Ajustes finales del dataset</a></li>
   </ul></li>
   <li><a href="#análisis-univariado" id="toc-análisis-univariado" class="nav-link" data-scroll-target="#análisis-univariado">Análisis univariado</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#grupo-ops" id="toc-grupo-ops" class="nav-link" data-scroll-target="#grupo-ops">Grupo OPS</a></li>
   <li><a href="#sexo" id="toc-sexo" class="nav-link" data-scroll-target="#sexo">Sexo</a></li>
   <li><a href="#edad" id="toc-edad" class="nav-link" data-scroll-target="#edad">Edad</a></li>
   </ul></li>
   <li><a href="#análisis-bivariado-nom_667_ops_grupo-vs-variables-relevantes" id="toc-análisis-bivariado-nom_667_ops_grupo-vs-variables-relevantes" class="nav-link" data-scroll-target="#análisis-bivariado-nom_667_ops_grupo-vs-variables-relevantes">Análisis bivariado: <code>NOM_667_OPS_GRUPO</code> vs variables relevantes</a>
-  <ul class="collapse">
-  <li><a href="#grupo-ops-sexo" id="toc-grupo-ops-sexo" class="nav-link" data-scroll-target="#grupo-ops-sexo">5.1 Grupo OPS × Sexo</a></li>
-  <li><a href="#grupo-ops-grupo-etario" id="toc-grupo-ops-grupo-etario" class="nav-link" data-scroll-target="#grupo-ops-grupo-etario">5.2 Grupo OPS × Grupo etario</a></li>
+  <ul>
+  <li><a href="#grupo-ops-sexo" id="toc-grupo-ops-sexo" class="nav-link" data-scroll-target="#grupo-ops-sexo">Grupo OPS × Sexo</a></li>
+  <li><a href="#grupo-ops-grupo-etario" id="toc-grupo-ops-grupo-etario" class="nav-link" data-scroll-target="#grupo-ops-grupo-etario">Grupo OPS × Grupo etario</a></li>
   <li><a href="#grupo-ops-año" id="toc-grupo-ops-año" class="nav-link" data-scroll-target="#grupo-ops-año">Grupo OPS × Año</a></li>
   <li><a href="#grupo-ops-régimen-de-seguridad-social" id="toc-grupo-ops-régimen-de-seguridad-social" class="nav-link" data-scroll-target="#grupo-ops-régimen-de-seguridad-social">Grupo OPS × Régimen de seguridad social</a></li>
   <li><a href="#grupo-ops-nivel-educativo" id="toc-grupo-ops-nivel-educativo" class="nav-link" data-scroll-target="#grupo-ops-nivel-educativo">Grupo OPS × Nivel educativo</a></li>
@@ -213,7 +217,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Introducción</h1>
+<h1 class="title"><span class="chapter-title">Análisis Exploratorio de Datos (EDA) sobre Mortalidad en Medellín (2012-2023)</span></h1>
 </div>
 
 
@@ -230,10 +234,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<p>Camilo Gonzalez y Rubén Esguerra</p>
+<section id="introducción" class="level2">
+<h2 class="anchored" data-anchor-id="introducción">Introducción</h2>
 <p>El estudio de la mortalidad en una población es fundamental para comprender los patrones de salud, identificar grupos de riesgo y orientar la formulación de políticas públicas. En la ciudad de Medellín, el registro de defunciones es gestionado por las Instituciones Prestadoras de Servicios de Salud (IPS), las cuales recopilan información de carácter demográfico, geográfico, temporal y clínico asociada a cada fallecimiento.</p>
 <p>El presente proyecto tiene como propósito desarrollar un Análisis Exploratorio de Datos (EDA) sobre el conjunto de datos de mortalidad en Medellín, el cual contiene aproximadamente 145.000 registros correspondientes al período 2012–2023. Esta información es suministrada por la Secretaría de Salud a través de la plataforma de datos abiertos MeData.</p>
 <p>Adicionalmente, este análisis servirá como base para la construcción de dashboards interactivos en herramientas como Dash (Python) y Shiny (R), facilitando la visualización de los hallazgos y su interpretación por parte de tomadores de decisiones.</p>
 <hr>
+</section>
 <section id="problema" class="level2">
 <h2 class="anchored" data-anchor-id="problema">Problema</h2>
 <p>A pesar de que el sistema de registro de defunciones en Medellín recopila una amplia variedad de variables —incluyendo aspectos demográficos, geográficos, socioeconómicos, temporales y relacionados con la causa de muerte—, la magnitud y complejidad del dataset dificultan la identificación rápida de patrones relevantes.</p>
@@ -1338,7 +1346,7 @@ dtype: float64</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-22-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="eda_VIS_Entregable2_files/figure-html/cell-22-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1384,7 +1392,7 @@ dtype: float64</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-23-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="eda_VIS_Entregable2_files/figure-html/cell-23-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1419,7 +1427,7 @@ Indeterminado           3  0.00</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-24-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="eda_VIS_Entregable2_files/figure-html/cell-24-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1450,7 +1458,7 @@ Name: EDAD_SIMPLE, dtype: float64</code></pre>
 <h2 class="anchored" data-anchor-id="análisis-bivariado-nom_667_ops_grupo-vs-variables-relevantes">Análisis bivariado: <code>NOM_667_OPS_GRUPO</code> vs variables relevantes</h2>
 <p>El objetivo es identificar posibles patrones o diferencias en las causas de muerte según características demográficas, sociales y temporales, lo cual permite enriquecer la interpretación de los datos más allá del análisis individual de cada variable.</p>
 <section id="grupo-ops-sexo" class="level3">
-<h3 class="anchored" data-anchor-id="grupo-ops-sexo">5.1 Grupo OPS × Sexo</h3>
+<h3 class="anchored" data-anchor-id="grupo-ops-sexo">Grupo OPS × Sexo</h3>
 <div id="fd1c3bd9" class="cell" data-execution_count="568">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabla de proporciones</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>ct_sexo <span class="op">=</span> pd.crosstab(</span>
@@ -1488,7 +1496,7 @@ Name: EDAD_SIMPLE, dtype: float64</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-25-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="eda_VIS_Entregable2_files/figure-html/cell-25-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1525,7 +1533,7 @@ Todas las demas enfermedades                            15414  </code></pre>
 <p>Estos resultados permiten identificar patrones diferenciados por sexo que pueden ser útiles en el análisis de salud pública.</p>
 </section>
 <section id="grupo-ops-grupo-etario" class="level3">
-<h3 class="anchored" data-anchor-id="grupo-ops-grupo-etario">5.2 Grupo OPS × Grupo etario</h3>
+<h3 class="anchored" data-anchor-id="grupo-ops-grupo-etario">Grupo OPS × Grupo etario</h3>
 <div id="7eae57e2" class="cell" data-execution_count="569">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ¿Qué edades concentra cada causa de muerte?</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>df_edad_ops <span class="op">=</span> df_clean[</span>
@@ -1556,7 +1564,7 @@ Todas las demas enfermedades                            15414  </code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="eda_VIS_Entregable2_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1600,7 +1608,7 @@ Todas las demas enfermedades                            15414  </code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="eda_VIS_Entregable2_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1642,7 +1650,7 @@ Todas las demas enfermedades                            15414  </code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-28-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="eda_VIS_Entregable2_files/figure-html/cell-28-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1677,7 +1685,7 @@ Todas las demas enfermedades                            15414  </code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-29-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="eda_VIS_Entregable2_files/figure-html/cell-29-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1761,7 +1769,7 @@ dtype: float64</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="eda_VIS_Entregable2_web_files/figure-html/cell-31-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="eda_VIS_Entregable2_files/figure-html/cell-31-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -2301,6 +2309,15 @@ Name: count, dtype: int64
     }
   });
   </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="Mortalidad en Medellín">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Mortalidad en Medellín</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
 </div> <!-- /content -->
 
 

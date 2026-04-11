@@ -1,15 +1,22 @@
 project:
-  type: website
+  type: book
+  output-dir: docs
 
-website:
-  title: "Análisis de Mortalidad"
+book:
+  title: "Mortalidad en Medellín"
   sidebar:
-    search: true
-    contents:
-      - index.qmd
-      - eda_VIS_Entregable2.ipynb
+    logo: logo.png
+    collapse-level: 1
+  chapters:
+    - index.qmd
+    - eda_VIS_Entregable2.ipynb
 
 format:
   html:
-    theme: cosmo
+    theme: flatly
     toc: true
+    toc-title: "Contenido"
+    toc-location: right
+    toc-depth: 4
+    toc-expand: true
+    number-sections: false
