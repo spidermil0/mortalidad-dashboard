@@ -69,7 +69,7 @@ mortalidad-dashboard/
 
 ---
 
-## 🚀 Instrucciones para Ejecutar en Local
+## 💻 Instrucciones para Ejecutar en Local
 
 ### 1. Clonar el repositorio
 
@@ -111,22 +111,62 @@ Abre tu navegador en: **http://localhost:8050**
 
 ---
 
-## ☁️ Despliegue en Render (Opcional)
+## 🐳 Instrucciones para Ejecutar en Local
 
-El proyecto está preparado para ser desplegado en Render como Web Service.
+### 1. Verificar instalación de Docker
 
-### Configuración sugerida:
+Antes de iniciar, asegúrate de tener instalado y ejecutando Docker Desktop en el sistema.
 
-| Campo             | Valor                           |
-| ----------------- | ------------------------------- |
-| **Environment**   | Python 3                        |
-| **Build Command** | pip install -r requirements.txt |
-| **Start Command** | gunicorn app:server             |
+Descargar desde:
+https://www.docker.com/products/docker-desktop/
 
-> ⚠️ Nota: El despliegue en Render no es obligatorio para la ejecución del proyecto.
-> La aplicación funciona correctamente en entorno local siguiendo los pasos indicados anteriormente.
+### 2. Construir la imagen del proyecto
+docker build -t dashboard .
 
-> 💡 El dataset (`defunciones_clean.csv`) debe estar incluido en el repositorio.
+Este comando crea la imagen del proyecto con todas sus dependencias definidas en el Dockerfile.
+
+### 3. Ejecutar el contenedor
+docker run -p 10000:10000 dashboard
+
+Este comando inicia la aplicación dentro de un contenedor y expone el puerto 10000.
+
+### 4. Abrir la aplicación
+
+Abrir en el navegador:
+
+http://localhost:10000
+
+### 5. Detener la ejecución
+
+Para detener la aplicación en ejecución:
+
+Ctrl + C
+
+---
+
+## ☁️ Despliegue en Render
+
+El proyecto está configurado para ser desplegado en la plataforma Render como servicio web.
+
+### Configuración del servicio
+
+En el panel de Render, crear un nuevo Web Service a partir del repositorio de GitHub y configurar:
+
+Branch: main
+Environment: Docker
+Build Method: Dockerfile
+Start Command: automático desde Dockerfile
+Actualización del despliegue
+
+Cada cambio realizado en la rama main del repositorio activa automáticamente un redeploy en Render. En caso de no reflejar cambios recientes, se puede ejecutar un despliegue manual desde el panel del servicio.
+
+### Acceso a la aplicación
+
+Una vez desplegado, Render generará una URL pública del tipo:
+
+https://nombre-del-servicio.onrender.com
+
+Esta URL permite acceder al dashboard sin necesidad de ejecutar el proyecto localmente.
 
 ---
 
