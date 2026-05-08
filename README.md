@@ -104,9 +104,10 @@ Razones de selección:
   aportaron menor capacidad predictiva.
 
 - El desempeño del modelo está limitado por la naturaleza de las variables disponibles, que describen el perfil del individuo pero no la causa médica directa de fallecimiento.
-## 🛠️ Tecnologías Utilizadas
 
 ---
+
+## 🛠️ Tecnologías Utilizadas
 
 | Herramienta | Rol |
 |-------------|-----|
@@ -119,17 +120,32 @@ Razones de selección:
 | [Gunicorn](https://gunicorn.org/) | Servidor WSGI para producción |
 
 ---
+🌐 Acceso a la aplicación
+
+🔗 Dashboard interactivo:
+https://mortalidad-dashboard-pr0q.onrender.com/
+
+🔗 Notebook / Jupyter Book:
+https://spidermil0.github.io/mortalidad-dashboard/
+
+---
 
 ## 📁 Estructura del Proyecto
 
 ```
 mortalidad-dashboard/
 │
-├── app.py                   # Aplicación Dash principal
-├── requirements.txt         # Dependencias del proyecto
-├── README.md                # Documentación
-│
-└── defunciones_clean.csv    # Dataset limpio (debe estar en esta carpeta)
+├── app.py
+├── requirements.txt
+├── Dockerfile
+├── README.md
+├── defunciones_clean.csv
+├── eda_VIS_Entregable2.ipynb
+├── eda_VIS_Entregable3_Modelo.ipynb
+└── libro_entrega3/
+    ├── _config.yml
+    ├── _toc.yml
+    └── eda_VIS_Entregable3_Modelo.ipynb
 ```
 
 > ⚠️ El archivo `defunciones_clean.csv` debe ubicarse en la **misma carpeta** que `app.py`.
@@ -195,7 +211,7 @@ Este comando crea la imagen del proyecto con todas sus dependencias definidas en
 ### 3. Ejecutar el contenedor
 docker run -e PORT=8050 -p 8050:8050 dashboard
 
-Este comando inicia la aplicación dentro de un contenedor y expone el puerto 10000.
+Este comando inicia la aplicación dentro de un contenedor y expone el puerto 8050.
 
 ### 4. Abrir la aplicación
 
@@ -230,13 +246,15 @@ El despliegue se realiza directamente desde el repositorio de GitHub, utilizando
 
 ### 🔄 Actualización del despliegue
 
-Cada cambio realizado en la rama **main** del repositorio activa automáticamente un nuevo despliegue en Render.
+Cada cambio realizado en el repositorio activa automáticamente un nuevo despliegue en Render.
 
 En caso de que los cambios recientes no se reflejen, se puede ejecutar un **redeploy manual** desde el panel del servicio.
 
 ### 🌐 Acceso a la aplicación
 
 🔗 **Link del dashboard:** https://mortalidad-dashboard-pr0q.onrender.com/
+
+🔗 **Notebook / Jupyter Book:** https://spidermil0.github.io/mortalidad-dashboard/
 
 ---
 
