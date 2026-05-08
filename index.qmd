@@ -1,9 +1,0 @@
----
-title: "Mortalidad en Medellín"
----
-
-# Introducción
-
-Este proyecto presenta un análisis exploratorio de datos (EDA) sobre la mortalidad en Medellín entre 2012 y 2023.
-
-Usa el menú lateral para navegar.

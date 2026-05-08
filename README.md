@@ -19,10 +19,11 @@ Este dashboard interactivo permite explorar los patrones de mortalidad en Medell
 |---------|-----------|
 | **Introducción** | Contexto del problema, KPIs del dataset, descripción de variables |
 | **Problema** | Pregunta central de investigación y sub-preguntas analíticas |
-| **Objetivos** | Objetivo general y 5 objetivos específicos |
+| **Objetivos** | Objetivo general y objetivos específicos |
 | **Análisis Univariado** | Distribución de Grupo OPS, Sexo, Edad, Seguridad Social, Educación, Tendencia anual |
 | **Análisis Bivariado** | Cruce de Grupo OPS con Sexo, Edad (boxplot), evolución anual, Seguridad Social, heatmap etario |
-| **Modelado Predictivo** | Random Forest + Árbol de Decisión, métricas, matriz de confusión, importancia de variables, **predicción interactiva** |
+| **Modelado Predictivo** | Random Forest + Árbol de Decisión, métricas, matrices de confusión, importancia de variables |
+| **Predicción Interactiva** | Formulario para estimar el grupo OPS usando el modelo Random Forest |
 
 ---
 
@@ -30,16 +31,82 @@ Este dashboard interactivo permite explorar los patrones de mortalidad en Medell
 
 | Modelo | Parámetros clave |
 |--------|-----------------|
-| **Random Forest** | `n_estimators=100`, `max_depth=10`, `random_state=42` |
-| **Árbol de Decisión** | `max_depth=8`, `random_state=42` |
+| **Random Forest** | `n_estimators=100`, `max_depth=10`, `class_weight="balanced_subsample"`, `random_state=42` |
+| **Árbol de Decisión** | `max_depth=8`, `class_weight="balanced"`, `random_state=42` |
 
-- División train/test: **80% / 20%** con `stratify=y`
-- Features: `SEXO`, `EDAD_SIMPLE`, `EST_CIVIL`, `SEG_SOCIAL`, `NIVEL_EDU_GRUPO`, `ANO`, `MES`
-- Codificación: `LabelEncoder` por variable categórica
+### Configuración del Pipeline
+
+- División train/test: **80% / 20%** usando `stratify=y`
+- Features utilizadas:
+  - `SEXO`
+  - `EDAD_SIMPLE`
+  - `EST_CIVIL`
+  - `SEG_SOCIAL`
+  - `NIVEL_EDU_GRUPO`
+  - `ANO`
+  - `MES`
+- Codificación de variables categóricas mediante `LabelEncoder`
+- Manejo de desbalance:
+  - Random Forest → `class_weight="balanced_subsample"`
+  - Árbol de Decisión → `class_weight="balanced"`
 
 ---
 
+## ⚠️ Desbalance de Clases
+
+La variable objetivo `NOM_667_OPS_GRUPO` presenta un desbalance importante:
+
+- Clase mayoritaria: **Enfermedades del sistema circulatorio** (~28.4%)
+- Clase minoritaria: **Signos, síntomas y afecciones mal definidas** (~0.5%)
+- Ratio mayoría/minoría aproximado: **55:1**
+
+Debido a este comportamiento:
+
+- El **Accuracy** puede resultar engañoso.
+- La métrica principal utilizada para seleccionar el modelo es el **F1-Score Weighted**.
+- También se analiza el **F1 Macro** y el **Recall Macro** para evaluar desempeño en clases minoritarias.
+
+---
+
+## 📈 Resultados del Modelo
+
+| Modelo | Accuracy | F1 Weighted ★ | F1 Macro | Recall Macro | Precision Weighted |
+|---|---|---|---|---|---|
+| Random Forest | 38.79% | 37.52% | 38.85% | 46.30% | 38.77% |
+| Árbol de Decisión | 35.80% | 34.51% | 36.50% | 44.60% | 38.30% |
+
+### ✅ Modelo Seleccionado: Random Forest
+
+Razones de selección:
+
+1. Mayor F1-Score Weighted bajo desbalance de clases.
+2. Mejor desempeño en F1 Macro y Recall Macro.
+3. Mejor capacidad para detectar clases minoritarias.
+4. Uso de `class_weight="balanced_subsample"` para ajustar pesos dinámicamente en cada árbol del ensamble.
+5. Mayor robustez general frente al Árbol de Decisión individual.
+
+---
+
+## 📌 Hallazgos del Modelado
+
+- `EDAD_SIMPLE` fue la variable más importante del modelo (~60.7% de importancia).
+- Las clases:
+  - *Enfermedades del sistema circulatorio*
+  - *Neoplasias*
+  - *Todas las demás enfermedades*
+
+  presentan perfiles demográficos muy similares, dificultando la separación entre categorías.
+
+- Variables socioeconómicas como:
+  - `SEG_SOCIAL`
+  - `SEXO`
+
+  aportaron menor capacidad predictiva.
+
+- El desempeño del modelo está limitado por la naturaleza de las variables disponibles, que describen el perfil del individuo pero no la causa médica directa de fallecimiento.
 ## 🛠️ Tecnologías Utilizadas
+
+---
 
 | Herramienta | Rol |
 |-------------|-----|
@@ -126,7 +193,7 @@ docker build -t dashboard .
 Este comando crea la imagen del proyecto con todas sus dependencias definidas en el Dockerfile.
 
 ### 3. Ejecutar el contenedor
-docker run -p 10000:10000 dashboard
+docker run -e PORT=8050 -p 8050:8050 dashboard
 
 Este comando inicia la aplicación dentro de un contenedor y expone el puerto 10000.
 
@@ -134,7 +201,7 @@ Este comando inicia la aplicación dentro de un contenedor y expone el puerto 10
 
 Abrir en el navegador:
 
-http://localhost:10000
+http://localhost:8050
 
 ### 5. Detener la ejecución
 

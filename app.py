@@ -34,13 +34,13 @@ df = pd.read_csv("defunciones_clean.csv")
 
 # Paleta de colores institucional
 OPS_COLORS = {
-    "Enfermedades del sistema circulatorio":                "#E63946",
-    "Neoplasias (Tumores)":                                 "#457B9D",
-    "Todas las demas enfermedades":                         "#2A9D8F",
-    "Enfermedades Transmisibles":                           "#E9C46A",
-    "Causas externas":                                      "#F4A261",
-    "Ciertas afecciones originadas en el periodo perinatal":"#6D6875",
-    "Signos sintomas y afecciones mal definidas":           "#A8DADC",
+    "Enfermedades del sistema circulatorio":                "#1B4F72",
+    "Neoplasias (Tumores)":                                 "#2E86C1",
+    "Todas las demas enfermedades":                         "#5DADE2",
+    "Enfermedades Transmisibles":                           "#85C1E9",
+    "Causas externas":                                      "#7F8C8D",
+    "Ciertas afecciones originadas en el periodo perinatal":"#AAB7B8",
+    "Signos sintomas y afecciones mal definidas":           "#D5D8DC",
 }
 
 COLOR_SEQ = list(OPS_COLORS.values())
@@ -80,23 +80,32 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # ---- Random Forest ----
-rf_model = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42, n_jobs=-1)
+rf_model = RandomForestClassifier(
+    n_estimators=100, max_depth=10,
+    class_weight="balanced_subsample",   # manejo desbalance 55:1
+    random_state=42, n_jobs=-1
+)
 rf_model.fit(X_train, y_train)
 rf_pred = rf_model.predict(X_test)
 
 # ---- Decision Tree ----
-dt_model = DecisionTreeClassifier(max_depth=8, random_state=42)
+dt_model = DecisionTreeClassifier(
+    max_depth=8,
+    class_weight="balanced",             # manejo desbalance 55:1
+    random_state=42
+)
 dt_model.fit(X_train, y_train)
 dt_pred = dt_model.predict(X_test)
 
-# ---- Métricas ----
+# ---- Métricas (alineadas con notebook final) ----
 def get_metrics(y_true, y_pred, name):
     return {
-        "Modelo":     name,
-        "Accuracy":   round(accuracy_score(y_true, y_pred) * 100, 2),
-        "Precision":  round(precision_score(y_true, y_pred, average="weighted", zero_division=0) * 100, 2),
-        "Recall":     round(recall_score(y_true, y_pred, average="weighted", zero_division=0) * 100, 2),
-        "F1-Score":   round(f1_score(y_true, y_pred, average="weighted", zero_division=0) * 100, 2),
+        "Modelo":         name,
+        "Accuracy":       round(accuracy_score(y_true, y_pred) * 100, 2),
+        "F1 Weighted ★":  round(f1_score(y_true, y_pred, average="weighted", zero_division=0) * 100, 2),
+        "F1 Macro":       round(f1_score(y_true, y_pred, average="macro",    zero_division=0) * 100, 2),
+        "Recall Macro":   round(recall_score(y_true, y_pred, average="macro",zero_division=0) * 100, 2),
+        "Precision W":    round(precision_score(y_true, y_pred, average="weighted", zero_division=0) * 100, 2),
     }
 
 metrics_df = pd.DataFrame([
@@ -132,7 +141,7 @@ def fig_sexo():
     counts = df["SEXO"].value_counts().reset_index()
     counts.columns = ["Sexo", "Cantidad"]
     fig = px.bar(counts, x="Sexo", y="Cantidad", color="Sexo",
-                 color_discrete_sequence=["#457B9D","#E63946","#A8DADC"],
+                 color_discrete_map={"Masculino": "#2E86C1", "Femenino": "#D4A5C9", "Indeterminado": "#AAB7B8"},
                  text="Cantidad", title="Distribución por Sexo")
     fig.update_traces(textposition="outside")
     fig.update_layout(**LAYOUT_BASE, showlegend=False, height=350)
@@ -151,7 +160,7 @@ def fig_seg_social():
     counts = df[df["SEG_SOCIAL"] != "Sin info"]["SEG_SOCIAL"].value_counts().reset_index()
     counts.columns = ["Régimen", "Cantidad"]
     fig = px.bar(counts, x="Régimen", y="Cantidad", color="Régimen",
-                 color_discrete_sequence=px.colors.qualitative.Set2,
+                 color_discrete_sequence=["#1B4F72","#2E86C1","#5DADE2","#85C1E9","#AED6F1"],
                  text="Cantidad", title="Distribución por Régimen de Seguridad Social")
     fig.update_traces(textposition="outside")
     fig.update_layout(**LAYOUT_BASE, showlegend=False, height=350)
@@ -162,7 +171,7 @@ def fig_edu():
     counts = df["NIVEL_EDU_GRUPO"].value_counts().reindex(orden).dropna().reset_index()
     counts.columns = ["Nivel", "Cantidad"]
     fig = px.bar(counts, x="Nivel", y="Cantidad", color="Nivel",
-                 color_discrete_sequence=px.colors.qualitative.Pastel,
+                 color_discrete_sequence=["#1B4F72","#2E86C1","#5DADE2","#85C1E9","#D6EAF8"],
                  text="Cantidad", title="Distribución por Nivel Educativo")
     fig.update_traces(textposition="outside")
     fig.update_layout(**LAYOUT_BASE, showlegend=False, height=350)
@@ -172,7 +181,7 @@ def fig_anual():
     anual = df.groupby("ANO").size().reset_index(name="Defunciones")
     fig = px.line(anual, x="ANO", y="Defunciones", markers=True,
                   title="Total de Defunciones por Año",
-                  color_discrete_sequence=["#E63946"])
+                  color_discrete_sequence=["#2E86C1"])
     fig.update_layout(**LAYOUT_BASE, height=350)
     fig.update_xaxes(dtick=1)
     return fig
@@ -184,10 +193,11 @@ def fig_ops_sexo():
     ct_melted = ct.melt(id_vars="NOM_667_OPS_GRUPO", var_name="Sexo", value_name="Porcentaje")
     fig = px.bar(ct_melted, x="NOM_667_OPS_GRUPO", y="Porcentaje", color="Sexo",
                  barmode="stack",
-                 color_discrete_sequence=["#457B9D","#E63946","#A8DADC"],
+                 color_discrete_map={"Masculino": "#2E86C1", "Femenino": "#D4A5C9", "Indeterminado": "#AAB7B8"},
                  title="Distribución de Sexo por Grupo OPS (%)")
     fig.update_xaxes(title="", tickangle=-25)
-    fig.update_layout(**LAYOUT_BASE, height=420)
+    fig.update_layout(**LAYOUT_BASE, height=420,
+                      legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=10, color="#2C3E50")))
     return fig
 
 def fig_ops_edad():
@@ -206,7 +216,8 @@ def fig_ops_anual():
                   color_discrete_map=OPS_COLORS, markers=True,
                   title="Evolución Anual de Defunciones por Grupo OPS")
     fig.update_xaxes(dtick=1, title="Año")
-    fig.update_layout(**LAYOUT_BASE, height=430)
+    fig.update_layout(**LAYOUT_BASE, height=430,
+                      legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=10, color="#2C3E50")))
     return fig
 
 def fig_ops_seg():
@@ -215,10 +226,11 @@ def fig_ops_seg():
     ct_melted = ct.reset_index().melt(id_vars="NOM_667_OPS_GRUPO", var_name="Régimen", value_name="Porcentaje")
     fig = px.bar(ct_melted, x="NOM_667_OPS_GRUPO", y="Porcentaje", color="Régimen",
                  barmode="stack",
-                 color_discrete_sequence=px.colors.qualitative.Set2,
+                 color_discrete_sequence=["#1B4F72","#2E86C1","#5DADE2","#85C1E9","#AED6F1"],
                  title="Seguridad Social por Grupo OPS (%)")
     fig.update_xaxes(title="", tickangle=-25)
-    fig.update_layout(**LAYOUT_BASE, height=420)
+    fig.update_layout(**LAYOUT_BASE, height=420,
+                      legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=10, color="#2C3E50")))
     return fig
 
 def fig_heatmap_edad_ops():
@@ -264,13 +276,13 @@ def fig_feat_imp():
 
 # Layout base para gráficos
 LAYOUT_BASE = dict(
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="IBM Plex Sans, sans-serif", size=12, color="#E0E6ED"),
-    title_font=dict(size=14, color="#E0E6ED"),
+    paper_bgcolor="#FFFFFF",
+    plot_bgcolor="#F8F9FA",
+    font=dict(family="IBM Plex Sans, sans-serif", size=12, color="#2C3E50"),
+    title_font=dict(size=14, color="#2C3E50"),
     margin=dict(l=20, r=20, t=50, b=20),
-    legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=10)),
 )
+_LEGEND = dict(bgcolor="rgba(0,0,0,0)", font=dict(size=10, color="#2C3E50"))
 
 # =============================================================================
 # 4. APP LAYOUT
@@ -278,7 +290,7 @@ LAYOUT_BASE = dict(
 app = dash.Dash(
     __name__,
     external_stylesheets=[
-        dbc.themes.CYBORG,
+        dbc.themes.FLATLY,
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Mono&display=swap",
         dbc.icons.BOOTSTRAP,  # 👈 esto ya incluye los iconos
     ],
@@ -367,7 +379,7 @@ def section_intro():
     kpis = [
         ("145,377", "Registros totales",  "bi-database",        "#00D4FF"),
         ("10 años", "Período analizado",  "bi-calendar-range",  "#2A9D8F"),
-        ("7 grupos","Categorías OPS",      "bi-diagram-3",       "#E63946"),
+        ("7 grupos","Categorías OPS",      "bi-diagram-3",       "#2E86C1"),
         ("11",      "Variables",          "bi-table",           "#E9C46A"),
     ]
     kpi_cards = dbc.Row([
@@ -461,7 +473,7 @@ def section_objetivos():
         ("bi-2-circle", "#2A9D8F", "Explorar relaciones entre causas de muerte y variables demográficas (sexo, edad, estado civil)."),
         ("bi-3-circle", "#E9C46A", "Analizar el comportamiento temporal de la mortalidad entre 2012 y 2021."),
         ("bi-4-circle", "#F4A261", "Comparar el desempeño predictivo de Random Forest y Árbol de Decisión."),
-        ("bi-5-circle", "#E63946", "Construir una herramienta interactiva de predicción del grupo OPS."),
+        ("bi-5-circle", "#2E86C1", "Construir una herramienta interactiva de predicción del grupo OPS."),
     ]
     return html.Div([
         html.H2("Objetivos", className="section-title"),
@@ -558,91 +570,152 @@ def section_bivariado():
 
 
 def section_modelo():
-    # Tabla de métricas
-    metric_rows = []
-    for _, row in metrics_df.iterrows():
-        best_acc = metrics_df["Accuracy"].max()
-        metric_rows.append(html.Tr([
-            html.Td(row["Modelo"]),
-            html.Td(f"{row['Accuracy']}%",  style={"color":"#00D4FF" if row["Accuracy"] == best_acc else "inherit", "fontWeight":"bold" if row["Accuracy"] == best_acc else "normal"}),
-            html.Td(f"{row['Precision']}%"),
-            html.Td(f"{row['Recall']}%"),
-            html.Td(f"{row['F1-Score']}%"),
-        ]))
 
-    metrics_table = dbc.Table([
-        html.Thead(html.Tr([html.Th(c) for c in ["Modelo","Accuracy","Precision","Recall","F1-Score"]])),
-        html.Tbody(metric_rows)
-    ], striped=True, hover=True, size="sm", className="table-dark")
+    # ── helpers ──────────────────────────────────────────────────────────────
+    METR_COLS = ["Modelo", "Accuracy", "F1 Weighted ★", "F1 Macro", "Recall Macro", "Precision W"]
 
-    # Opciones de dropdowns para predicción
     def mk_select(id_, opts, placeholder):
         return dcc.Dropdown(
             id=id_, options=[{"label": o, "value": o} for o in opts],
-            placeholder=placeholder, clearable=False, className="mb-3 dropdown-dark"
+            placeholder=placeholder, clearable=False, className="mb-3"
         )
 
-    return html.Div([
-        html.H2("Modelado Predictivo", className="section-title"),
+    # ── Tabla comparativa ────────────────────────────────────────────────────
+    best_f1 = metrics_df["F1 Weighted ★"].max()
+    metric_rows = []
+    for _, row in metrics_df.iterrows():
+        is_best = row["F1 Weighted ★"] == best_f1
+        metric_rows.append(html.Tr([
+            html.Td(html.Strong(row["Modelo"]) if is_best else row["Modelo"]),
+            html.Td(f"{row['Accuracy']}%"),
+            html.Td(
+                html.Strong(f"{row['F1 Weighted ★']}%", style={"color": "#1a6b3c"}),
+                style={"background": "#d4edda"}
+            ),
+            html.Td(f"{row['F1 Macro']}%"),
+            html.Td(f"{row['Recall Macro']}%"),
+            html.Td(f"{row['Precision W']}%"),
+        ]))
 
-        # Sub-sección: pipeline
+    metrics_table = dbc.Table([
+        html.Thead(html.Tr([html.Th(c) for c in METR_COLS])),
+        html.Tbody(metric_rows),
+    ], striped=True, hover=True, size="sm")
+
+    # ── Gráfico barras comparativo ────────────────────────────────────────────
+    metr_bar_cols = ["Accuracy", "F1 Weighted ★", "F1 Macro", "Recall Macro"]
+    fig_bars = go.Figure()
+    for i, (_, row) in enumerate(metrics_df.iterrows()):
+        fig_bars.add_trace(go.Bar(
+            name=row["Modelo"],
+            x=metr_bar_cols,
+            y=[row[c] for c in metr_bar_cols],
+            marker_color=["#1B4F72", "#2E86C1"][i],
+            text=[f"{row[c]:.1f}%" for c in metr_bar_cols],
+            textposition="outside",
+        ))
+    fig_bars.update_layout(
+        **LAYOUT_BASE,
+        barmode="group", height=340,
+        title="Comparación de métricas por modelo",
+        yaxis=dict(title="%", range=[0, 60]),
+        legend=dict(orientation="h", y=-0.25, font=dict(color="#2C3E50")),
+        annotations=[dict(
+            text="★ Métrica principal — dataset desbalanceado (ratio 55:1)",
+            xref="paper", yref="paper", x=0, y=1.08,
+            showarrow=False, font=dict(size=10, color="#5D6D7E"),
+        )],
+    )
+
+    # ── TAB 1: Métricas ───────────────────────────────────────────────────────
+    tab_metricas = html.Div([
+        # Contexto desbalance
         dbc.Alert([
-            html.H6("⚙️ Pipeline de Modelado", className="mb-2 text-info"),
-            html.Ul([
-                html.Li("Features: SEXO, EDAD_SIMPLE, EST_CIVIL, SEG_SOCIAL, NIVEL_EDU_GRUPO, ANO, MES"),
-                html.Li("Codificación: LabelEncoder para variables categóricas"),
-                html.Li("División: 80% Train / 20% Test (stratify=y, random_state=42)"),
-                html.Li("Modelos: RandomForestClassifier (100 árboles, max_depth=10) y DecisionTreeClassifier (max_depth=8)"),
-            ], className="mb-0"),
-        ], color="dark", className="border border-info mb-4"),
+            html.Strong("⚠️ Desbalance de clases: ratio 55:1 "),
+            "(circulatorio 28.4% vs mal definidas 0.5%). ",
+            "El Accuracy puede ser engañoso — la métrica principal es el ",
+            html.Strong("F1-Score Weighted"), ". Se usó ",
+            html.Code("class_weight='balanced_subsample'"),
+            " en Random Forest y ",
+            html.Code("class_weight='balanced'"),
+            " en Árbol de Decisión.",
+        ], color="warning", className="mb-3 py-2"),
 
-        # Métricas
-        html.H5("📊 Comparación de Modelos", className="mb-3"),
-        dbc.Card(dbc.CardBody(metrics_table), className="stat-card mb-4"),
+        # Tabla
+        dbc.Card(dbc.CardBody([
+            html.P("★ F1 Weighted = métrica principal  |  verde = mejor valor por columna",
+                   className="text-muted small mb-2"),
+            metrics_table,
+        ]), className="mb-4"),
 
-        # Gráficos de evaluación
+        # Barras + Feature importance
         dbc.Row([
-            dbc.Col([
-                html.Label("Seleccionar modelo:", className="text-muted mb-1"),
-                dcc.Dropdown(
-                    id="dd-model-cm",
-                    options=[
-                        {"label":"Random Forest",    "value":"Random Forest"},
-                        {"label":"Árbol de Decisión","value":"Árbol de Decisión"},
-                    ],
-                    value="Random Forest", clearable=False, className="mb-3 dropdown-dark"
-                ),
-                dbc.Card(dbc.CardBody([
-                    dcc.Graph(id="graph-cm", config={"displayModeBar": False}),
-                ]), className="stat-card"),
-            ], md=7, className="mb-4"),
-
-            dbc.Col([
-                dbc.Card(dbc.CardBody([
-                    dcc.Graph(figure=fig_feat_imp(), config={"displayModeBar": False}),
-                ]), className="stat-card"),
-            ], md=5, className="mb-4"),
+            dbc.Col(dbc.Card(dbc.CardBody(
+                dcc.Graph(figure=fig_bars, config={"displayModeBar": False})
+            )), md=7, className="mb-4"),
+            dbc.Col(dbc.Card(dbc.CardBody(
+                dcc.Graph(figure=fig_feat_imp(), config={"displayModeBar": False})
+            )), md=5, className="mb-4"),
         ]),
 
-        html.Hr(className="border-secondary my-4"),
+        # Matriz de confusión
+        dbc.Card(dbc.CardBody([
+            html.Label("Matriz de confusión — normalizada por fila (% por clase real):",
+                       className="text-muted small mb-2 d-block"),
+            dcc.Dropdown(
+                id="dd-model-cm",
+                options=[
+                    {"label": "Random Forest",     "value": "Random Forest"},
+                    {"label": "Árbol de Decisión", "value": "Árbol de Decisión"},
+                ],
+                value="Random Forest", clearable=False, className="mb-3",
+                style={"maxWidth": "280px"},
+            ),
+            dcc.Graph(id="graph-cm", config={"displayModeBar": False}),
+            html.Small(
+                "Normalización por fila compensa el desbalance — cada fila suma 100%.",
+                className="text-muted mt-1 d-block"
+            ),
+        ])),
 
-        # ---- Predicción interactiva ----
-        html.H4("🎯 Predicción Interactiva", className="mb-1 text-info"),
-        html.P("Ingresa los valores del individuo y obtén la predicción del Grupo OPS.", className="text-muted mb-4"),
+        # Conclusión del notebook
+        html.Hr(className="my-4"),
+        dbc.Alert([
+            html.H6("📌 Conclusión — Modelo seleccionado: Random Forest", className="mb-2"),
+            html.Ul([
+                html.Li([html.Strong("F1 Weighted: "), "37.52% vs 34.51% (+3 pp) — métrica principal bajo desbalance."]),
+                html.Li([html.Strong("F1 Macro: "),    "38.85% vs 36.50% — mejor detección en clases minoritarias."]),
+                html.Li([html.Strong("Recall Macro: "),"46.30% vs 44.60% — mayor cobertura real entre todas las clases."]),
+                html.Li([html.Strong("Límite del modelo: "), "las 3 clases mayoritarias (circulatorio, neoplasias, otras) comparten "
+                         "perfil etario similar — la edad explica el 60.7% de importancia pero no es "
+                         "suficiente para separar esas clases."]),
+                html.Li([html.Strong("class_weight='balanced_subsample': "), "ajusta pesos en cada árbol del ensamble, "
+                         "más robusto que 'balanced' en un árbol único con clases de soporte muy bajo."]),
+            ], className="mb-0"),
+        ], color="light", className="border border-primary mt-3"),
+    ], className="pt-3")
+
+    # ── TAB 2: Predicción ────────────────────────────────────────────────────
+    tab_prediccion = html.Div([
+        dbc.Alert([
+            html.Strong("Modelo en producción: Random Forest"),
+            " — mayor F1 Weighted (37.52%) y Recall Macro (46.30%). "
+            "Selecciona Árbol de Decisión para comparar predicciones.",
+        ], color="info", className="mb-3 py-2"),
 
         dbc.Card(dbc.CardBody([
             dbc.Row([
                 dbc.Col([
-                    html.Label("Modelo a usar:", className="fw-bold mb-1"),
+                    html.Label("Modelo:", className="fw-bold mb-1 small"),
                     dcc.RadioItems(
                         id="pred-modelo",
                         options=[
-                            {"label":"  Random Forest",    "value":"rf"},
-                            {"label":"  Árbol de Decisión","value":"dt"},
+                            {"label": "  Random Forest",     "value": "rf"},
+                            {"label": "  Árbol de Decisión", "value": "dt"},
                         ],
-                        value="rf", inline=True, className="mb-3",
-                        inputStyle={"marginRight":"6px"},
-                        labelStyle={"marginRight":"20px"},
+                        value="rf", inline=True, className="mb-4",
+                        inputStyle={"marginRight": "6px"},
+                        labelStyle={"marginRight": "20px"},
                     ),
                 ], md=12),
 
@@ -658,16 +731,16 @@ def section_modelo():
                 dbc.Col([
                     html.Label("Nivel Educativo", className="text-muted small"),
                     mk_select("pred-edu", ["Básica","Media","Técnico/Tecnológico","Superior","Sin info"], "Seleccionar…"),
-                    html.Label(f"Edad: ", className="text-muted small", id="lbl-edad"),
+                    html.Label("Edad (años)", className="text-muted small"),
                     dcc.Slider(id="pred-edad", min=0, max=110, step=1, value=68,
                                marks={0:"0", 20:"20", 40:"40", 60:"60", 80:"80", 110:"110"},
                                tooltip={"placement":"bottom","always_visible":True},
-                               className="mb-3"),
+                               className="mb-4"),
                     html.Label("Año de defunción", className="text-muted small"),
                     dcc.Slider(id="pred-ano", min=2012, max=2021, step=1, value=2019,
                                marks={y: str(y) for y in range(2012, 2022, 2)},
                                tooltip={"placement":"bottom","always_visible":True},
-                               className="mb-3"),
+                               className="mb-4"),
                 ], md=4),
 
                 dbc.Col([
@@ -675,18 +748,36 @@ def section_modelo():
                     dcc.Slider(id="pred-mes", min=1, max=12, step=1, value=6,
                                marks={1:"Ene",3:"Mar",6:"Jun",9:"Sep",12:"Dic"},
                                tooltip={"placement":"bottom","always_visible":True},
-                               className="mb-3"),
+                               className="mb-4"),
                     html.Br(),
                     dbc.Button(
                         [html.I(className="bi bi-lightning-charge-fill me-2"), "Predecir"],
-                        id="btn-predecir", color="danger", size="lg",
-                        className="w-100 mt-2 fw-bold"
+                        id="btn-predecir", color="primary", size="lg",
+                        className="w-100 mt-2 fw-bold",
                     ),
                 ], md=4),
             ]),
-
             html.Div(id="pred-output", className="mt-4"),
-        ]), className="stat-card mb-4"),
+        ])),
+    ], className="pt-3")
+
+    # ── Layout con Tabs ──────────────────────────────────────────────────────
+    return html.Div([
+        html.H2("Modelado Predictivo", className="section-title"),
+
+        dbc.Alert([
+            html.Strong("Pipeline: "),
+            "Features: SEXO, EDAD_SIMPLE, EST_CIVIL, SEG_SOCIAL, NIVEL_EDU_GRUPO, ANO, MES  |  "
+            "LabelEncoder  |  80/20 stratified  |  ",
+            html.Code("class_weight"), " balanceado en ambos modelos  |  Train: 116,301  |  Test: 29,076",
+        ], color="light", className="border mb-4 py-2"),
+
+        dbc.Tabs([
+            dbc.Tab(tab_metricas,   label="📊 Métricas de modelos",
+                    tab_id="tab-metricas",   className="border border-top-0 p-3"),
+            dbc.Tab(tab_prediccion, label="🎯 Predicción interactiva",
+                    tab_id="tab-prediccion", className="border border-top-0 p-3"),
+        ], id="tabs-modelo", active_tab="tab-metricas"),
     ])
 
 
@@ -704,14 +795,14 @@ app.layout = html.Div([
             "marginLeft": "220px",
             "padding": "32px",
             "minHeight": "100vh",
-            "backgroundColor": "#0A0F1A",
-            "color": "#E0E6ED",
+            "backgroundColor": "#FFFFFF",
+            "color": "#2C3E50",
             "fontFamily": "Arial, sans-serif"
         }
     ),
 
 ], style={
-    "backgroundColor": "#0A0F1A",
+    "backgroundColor": "#FFFFFF",
     "minHeight": "100vh"
 })
 

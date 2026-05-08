@@ -1,0 +1,5 @@
+title: "Análisis de Mortalidad en Medellín"
+author: "Camilo González & Rubén Esguerra"
+execute:
+  execute_notebooks: "off"
+  use_repository_button: true
