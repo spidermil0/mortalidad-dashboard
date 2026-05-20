@@ -511,6 +511,10 @@ app.index_string = '''
             ::-webkit-scrollbar { width: 6px; }
             ::-webkit-scrollbar-track { background: transparent; }
             ::-webkit-scrollbar-thumb { background: #B0C4D8; border-radius: 3px; }
+            .sidebar-author-link:hover {
+                color: #FFFFFF !important;
+                background: rgba(46,134,193,0.12) !important;
+            }
             /* ── Gradient cards (problema / objetivos) ────── */
             .gradient-card-red {
                 background: linear-gradient(135deg, #8B1A1A 0%, #C0392B 50%, #922B21 100%);
@@ -610,7 +614,35 @@ sidebar = html.Div([
                    style={"color": "#4E6480", "fontSize": "0.75rem"}),
             html.Span("11 variables",
                       style={"fontSize": "0.75rem", "color": "#5A7290"}),
-        ]),
+        ], style={"marginBottom": "14px"}),
+        html.Hr(style={"borderColor": "#1E3050", "margin": "0 0 12px 0"}),
+        html.Div([
+            html.I(className="bi bi-people-fill me-2",
+                   style={"color": "#4E6480", "fontSize": "0.72rem"}),
+            html.Span("Autores", style={
+                "fontSize": "0.62rem", "fontWeight": "600", "letterSpacing": "0.08em",
+                "textTransform": "uppercase", "color": "#4E6480",
+            }),
+        ], style={"marginBottom": "8px"}),
+        html.A([
+            html.I(className="bi bi-github me-2",
+                   style={"fontSize": "0.72rem"}),
+            "Camilo González",
+        ], href="https://github.com/spidermil0", target="_blank", style={
+            "display": "block", "fontSize": "0.76rem", "color": "#7A93AD",
+            "textDecoration": "none", "padding": "4px 2px", "borderRadius": "5px",
+            "transition": "color 0.15s ease, background 0.15s ease",
+            "marginBottom": "2px",
+        }, className="sidebar-author-link"),
+        html.A([
+            html.I(className="bi bi-github me-2",
+                   style={"fontSize": "0.72rem"}),
+            "Rubén Esguerra",
+        ], href="https://github.com/RubenEsg", target="_blank", style={
+            "display": "block", "fontSize": "0.76rem", "color": "#7A93AD",
+            "textDecoration": "none", "padding": "4px 2px", "borderRadius": "5px",
+            "transition": "color 0.15s ease, background 0.15s ease",
+        }, className="sidebar-author-link"),
     ], style={"padding": "4px 12px"}),
 
 ], style={
@@ -760,11 +792,106 @@ def section_problema():
             "boxShadow": "0 4px 20px rgba(192,57,43,0.25)",
         }),
 
+        # ── KPI highlights del problema ───────────────────────────────────────
+        dbc.Row([
+            dbc.Col(html.Div([
+                html.Div("~28%", style={"fontFamily":"DM Serif Display, serif",
+                    "fontSize":"1.9rem","color":"#C0392B","lineHeight":"1"}),
+                html.Div("enf. circulatorias", style={"fontSize":"0.7rem","color":"#7A93AD",
+                    "textTransform":"uppercase","letterSpacing":"0.05em","marginTop":"5px"}),
+                html.Div("causa más frecuente", style={"fontSize":"0.72rem","color":"#A8BCCF","marginTop":"2px"}),
+            ], className="stat-card", style={"padding":"20px","textAlign":"center"}), md=3, className="mb-3"),
+
+            dbc.Col(html.Div([
+                html.Div("65%", style={"fontFamily":"DM Serif Display, serif",
+                    "fontSize":"1.9rem","color":"#2E86C1","lineHeight":"1"}),
+                html.Div("mortalidad en 3 grupos", style={"fontSize":"0.7rem","color":"#7A93AD",
+                    "textTransform":"uppercase","letterSpacing":"0.05em","marginTop":"5px"}),
+                html.Div("circ. · neoplasias · externas", style={"fontSize":"0.72rem","color":"#A8BCCF","marginTop":"2px"}),
+            ], className="stat-card", style={"padding":"20px","textAlign":"center"}), md=3, className="mb-3"),
+
+            dbc.Col(html.Div([
+                html.Div("55:1", style={"fontFamily":"DM Serif Display, serif",
+                    "fontSize":"1.9rem","color":"#E9A128","lineHeight":"1"}),
+                html.Div("ratio de desbalance", style={"fontSize":"0.7rem","color":"#7A93AD",
+                    "textTransform":"uppercase","letterSpacing":"0.05em","marginTop":"5px"}),
+                html.Div("clase mayor vs. menor", style={"fontSize":"0.72rem","color":"#A8BCCF","marginTop":"2px"}),
+            ], className="stat-card", style={"padding":"20px","textAlign":"center"}), md=3, className="mb-3"),
+
+            dbc.Col(html.Div([
+                html.Div("3×", style={"fontFamily":"DM Serif Display, serif",
+                    "fontSize":"1.9rem","color":"#2A9D8F","lineHeight":"1"}),
+                html.Div("hombres en causas externas", style={"fontSize":"0.7rem","color":"#7A93AD",
+                    "textTransform":"uppercase","letterSpacing":"0.05em","marginTop":"5px"}),
+                html.Div("vs. mujeres", style={"fontSize":"0.72rem","color":"#A8BCCF","marginTop":"2px"}),
+            ], className="stat-card", style={"padding":"20px","textAlign":"center"}), md=3, className="mb-3"),
+        ], className="g-3 mb-3"),
+
+        # ── Mini timeline COVID ───────────────────────────────────────────────
+        html.Div([
+            html.Div([
+                html.Span("Contexto temporal", style={
+                    "fontSize":"0.68rem","fontWeight":"600","letterSpacing":"0.1em",
+                    "textTransform":"uppercase","color":"#5A7290","display":"block","marginBottom":"16px",
+                }),
+                html.Div([
+                    # 2019
+                    html.Div([
+                        html.Div([
+                            html.I(className="bi bi-circle-fill",
+                                   style={"color":"#2A9D8F","fontSize":"0.65rem"}),
+                        ], style={"marginBottom":"8px"}),
+                        html.Div("2019", style={"fontFamily":"DM Serif Display, serif",
+                            "fontSize":"1.1rem","color":"#1A2B3C","fontWeight":"400"}),
+                        html.Div("Patrón estable", style={"fontSize":"0.72rem","color":"#7A93AD","marginTop":"3px"}),
+                        html.Div("Circ. y neoplasias dominan", style={"fontSize":"0.68rem","color":"#A8BCCF","marginTop":"2px"}),
+                    ], style={"textAlign":"center","flex":"1"}),
+
+                    # flecha
+                    html.Div([
+                        html.Div(style={"height":"2px","background":"linear-gradient(90deg,#2A9D8F,#E9A128)","margin":"0 8px","marginTop":"8px"}),
+                    ], style={"flex":"1","display":"flex","flexDirection":"column","justifyContent":"flex-start","paddingTop":"2px"}),
+
+                    # 2020
+                    html.Div([
+                        html.Div([
+                            html.I(className="bi bi-exclamation-circle-fill",
+                                   style={"color":"#E9A128","fontSize":"0.8rem"}),
+                        ], style={"marginBottom":"8px"}),
+                        html.Div("2020", style={"fontFamily":"DM Serif Display, serif",
+                            "fontSize":"1.1rem","color":"#1A2B3C","fontWeight":"400"}),
+                        html.Div("Inicio pandemia", style={"fontSize":"0.72rem","color":"#7A93AD","marginTop":"3px"}),
+                        html.Div("↑ causas respiratorias", style={"fontSize":"0.68rem","color":"#E9A128","marginTop":"2px"}),
+                    ], style={"textAlign":"center","flex":"1"}),
+
+                    # flecha
+                    html.Div([
+                        html.Div(style={"height":"2px","background":"linear-gradient(90deg,#E9A128,#C0392B)","margin":"0 8px","marginTop":"8px"}),
+                    ], style={"flex":"1","display":"flex","flexDirection":"column","justifyContent":"flex-start","paddingTop":"2px"}),
+
+                    # 2021
+                    html.Div([
+                        html.Div([
+                            html.I(className="bi bi-circle-fill",
+                                   style={"color":"#C0392B","fontSize":"0.65rem"}),
+                        ], style={"marginBottom":"8px"}),
+                        html.Div("2021", style={"fontFamily":"DM Serif Display, serif",
+                            "fontSize":"1.1rem","color":"#1A2B3C","fontWeight":"400"}),
+                        html.Div("Impacto sostenido", style={"fontSize":"0.72rem","color":"#7A93AD","marginTop":"3px"}),
+                        html.Div("Alteración del patrón habitual", style={"fontSize":"0.68rem","color":"#C0392B","marginTop":"2px"}),
+                    ], style={"textAlign":"center","flex":"1"}),
+
+                ], style={"display":"flex","alignItems":"flex-start","gap":"4px"}),
+            ]),
+        ], className="stat-card", style={"padding":"24px 28px","marginBottom":"24px"}),
+
         # ── Dos columnas ─────────────────────────────────────────────────────
         dbc.Row([
             dbc.Col(html.Div([
                 html.Div([
-                    html.Span("📌", style={"marginRight": "8px"}),
+                    
+                    html.I(className="bi bi-search me-2",
+                           style={"color": "#2E86C1", "fontSize": "0.95rem"}),
                     html.Span("Sub-preguntas analíticas", style={
                         "fontWeight": "600", "fontSize": "0.9rem", "color": "#1A2B3C",
                     }),
@@ -784,7 +911,8 @@ def section_problema():
 
             dbc.Col(html.Div([
                 html.Div([
-                    html.Span("⚠️", style={"marginRight": "8px"}),
+                    html.I(className="bi bi-exclamation-circle me-2",
+                           style={"color": "#546E8A", "fontSize": "0.95rem"}),
                     html.Span("Relevancia del problema", style={
                         "fontWeight": "600", "fontSize": "0.9rem", "color": "#1A2B3C",
                     }),
@@ -840,6 +968,35 @@ def section_objetivos():
             "boxShadow": "0 4px 20px rgba(39,174,96,0.22)",
         }),
 
+        # ── Pipeline del proyecto ─────────────────────────────────────────────
+        html.Div("Pipeline del proyecto", style={
+            "fontSize": "0.7rem", "fontWeight": "600", "letterSpacing": "0.08em",
+            "textTransform": "uppercase", "color": "#5A7290", "marginBottom": "16px",
+        }),
+        html.Div([
+            dbc.Row([
+                *[dbc.Col(html.Div([
+                    html.Div(
+                        html.I(className=f"bi {ico}", style={"fontSize":"1.6rem","color":col}),
+                        style={"width":"52px","height":"52px","borderRadius":"12px",
+                               "background":bg,"display":"flex","alignItems":"center",
+                               "justifyContent":"center","margin":"0 auto 10px auto"}),
+                    html.Div(label, style={"fontSize":"0.78rem","fontWeight":"600",
+                                          "color":"#1A2B3C","textAlign":"center","marginBottom":"2px"}),
+                    html.Div(sub, style={"fontSize":"0.68rem","color":"#7A93AD","textAlign":"center"}),
+                ]), md=True, className="mb-2")
+                for ico, col, bg, label, sub in [
+                    ("bi-bar-chart-line","#2E86C1","#EBF5FB","EDA","Distribuciones"),
+                    ("bi-diagram-3",     "#2A9D8F","#E8F8F5","Relaciones","Variables cruzadas"),
+                    ("bi-clock-history", "#E9A128","#FEF9E7","Temporalidad","2012 – 2021"),
+                    ("bi-cpu",           "#546E8A","#EAECEE","Modelado","RF vs DT"),
+                    ("bi-bullseye",      "#2A9D8F","#E8F8F5","Predicción","Herramienta interactiva"),
+                ]],
+                # flechas entre pasos
+                *[],
+            ], className="g-2 align-items-start"),
+        ], className="stat-card", style={"padding":"24px 28px","marginBottom":"28px"}),
+
         # ── Objetivos específicos ─────────────────────────────────────────────
         html.Div("Objetivos Específicos", style={
             "fontSize": "0.7rem", "fontWeight": "600", "letterSpacing": "0.08em",
@@ -850,14 +1007,8 @@ def section_objetivos():
                 html.Div([
                     html.Div([
                         html.I(className=f"bi {icon}",
-                               style={"color": color, "fontSize": "1.3rem", "flexShrink": "0"}),
-                        html.Span(str(i+1), style={
-                            "fontSize": "0.65rem", "fontWeight": "700", "color": color,
-                            "background": f"rgba(100,150,200,0.1)", "borderRadius": "4px",
-                            "padding": "1px 5px", "flexShrink": "0",
-                        }),
-                    ], style={"display": "flex", "flexDirection": "column",
-                               "alignItems": "center", "gap": "4px", "marginRight": "14px"}),
+                               style={"color": color, "fontSize": "1.4rem", "flexShrink": "0"}),
+                    ], style={"display": "flex", "alignItems": "center", "marginRight": "14px"}),
                     html.P(desc, style={"fontSize": "0.87rem", "color": "#3D5266",
                                         "lineHeight": "1.55", "marginBottom": "0"}),
                 ], className="stat-card", style={
@@ -1666,4 +1817,4 @@ def update_desc_bivariado(val):
 # =============================================================================
 
 if __name__ == "__main__":
-    app.run(debug=False, host="127.0.0.1", port=8050)
+    app.run(debug=True, host="127.0.0.1", port=8050)
