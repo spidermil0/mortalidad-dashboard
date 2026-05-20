@@ -141,7 +141,7 @@ def fig_sexo():
     counts = df["SEXO"].value_counts().reset_index()
     counts.columns = ["Sexo", "Cantidad"]
     fig = px.bar(counts, x="Sexo", y="Cantidad", color="Sexo",
-                 color_discrete_map={"Masculino": "#2E86C1", "Femenino": "#D4A5C9", "Indeterminado": "#AAB7B8"},
+                 color_discrete_map={"Masculino": "#2E86C1", "Femenino": "#F4A3E1", "Indeterminado": "#AAB7B8"},
                  text="Cantidad", title="Distribución por Sexo")
     fig.update_traces(textposition="outside")
     fig.update_layout(**LAYOUT_BASE, showlegend=False, height=350)
@@ -193,7 +193,7 @@ def fig_ops_sexo():
     ct_melted = ct.melt(id_vars="NOM_667_OPS_GRUPO", var_name="Sexo", value_name="Porcentaje")
     fig = px.bar(ct_melted, x="NOM_667_OPS_GRUPO", y="Porcentaje", color="Sexo",
                  barmode="stack",
-                 color_discrete_map={"Masculino": "#2E86C1", "Femenino": "#D4A5C9", "Indeterminado": "#AAB7B8"},
+                 color_discrete_map={"Masculino": "#2E86C1", "Femenino": "#F4A3E1", "Indeterminado": "#AAB7B8"},
                  title="Distribución de Sexo por Grupo OPS (%)")
     fig.update_xaxes(title="", tickangle=-25)
     fig.update_layout(**LAYOUT_BASE, height=420,
@@ -278,9 +278,9 @@ def fig_feat_imp():
 LAYOUT_BASE = dict(
     paper_bgcolor="#FFFFFF",
     plot_bgcolor="#F8F9FA",
-    font=dict(family="IBM Plex Sans, sans-serif", size=12, color="#2C3E50"),
-    title_font=dict(size=14, color="#2C3E50"),
-    margin=dict(l=20, r=20, t=50, b=20),
+    font=dict(family="DM Sans, sans-serif", size=12, color="#2C3E50"),
+    title_font=dict(size=14, color="#1A2B3C", family="DM Sans, sans-serif"),
+    margin=dict(l=20, r=20, t=58, b=20),
 )
 _LEGEND = dict(bgcolor="rgba(0,0,0,0)", font=dict(size=10, color="#2C3E50"))
 
@@ -481,27 +481,31 @@ app.index_string = '''
             }
 
             /* ── Table ────────────────────────────────────── */
-            .table-dark { background: transparent !important; }
-            .table-dark th {
-                background: #1A2B3C !important;
-                color: #CBD8E6 !important;
-                font-size: 0.78rem;
+            .tabla-vars { width: 100%; border-collapse: collapse; }
+            .tabla-vars th {
+                background: #EAF0F6;
+                color: #3D5266;
+                font-size: 0.72rem;
                 font-weight: 600;
-                letter-spacing: 0.05em;
+                letter-spacing: 0.06em;
                 text-transform: uppercase;
-                border: none !important;
-                padding: 10px 14px !important;
+                border-top: none;
+                border-bottom: 2px solid #C8DEF5;
+                padding: 10px 14px;
             }
-            .table-dark td {
-                color: #2C3E50 !important;
-                font-size: 0.85rem;
-                border-color: #EBF0F5 !important;
-                padding: 9px 14px !important;
+            .tabla-vars td {
+                color: #3D5266;
+                font-size: 0.84rem;
+                border-bottom: 1px solid #EBF0F5;
+                padding: 9px 14px;
                 vertical-align: middle;
+                background: #FFFFFF;
             }
-            .table-dark tbody tr { background: #FFFFFF !important; }
-            .table-dark tbody tr:nth-child(even) { background: #F7FAFD !important; }
-            .table-dark tbody tr:hover { background: #EFF6FF !important; }
+            .tabla-vars tbody tr:nth-child(even) td { background: #F7FAFD; }
+            .tabla-vars tbody tr:hover td {
+                background: #EFF6FF;
+                transition: background 0.15s ease;
+            }
 
             /* ── Scrollbar ────────────────────────────────── */
             ::-webkit-scrollbar { width: 6px; }
@@ -582,12 +586,13 @@ sidebar = html.Div([
     # ── Nav ───────────────────────────────────────────────────────────────
     html.Div("Navegación", className="sidebar-section-label"),
     html.Div([
-        make_nav_btn("bi-info-circle",     "Introducción", "intro",      True),
+        make_nav_btn("bi-house-fill",     "Introducción", "intro",      True),
         make_nav_btn("bi-question-circle", "Problema",     "problema"),
         make_nav_btn("bi-bullseye",        "Objetivos",    "objetivos"),
         make_nav_btn("bi-bar-chart-line",  "Univariado",   "univariado"),
         make_nav_btn("bi-diagram-3",       "Bivariado",    "bivariado"),
         make_nav_btn("bi-cpu",             "Modelado",     "modelo"),
+        make_nav_btn("bi-check2-circle",   "Conclusiones", "conclusiones"),
     ], style={"padding": "0 4px"}),
 
     html.Hr(className="sidebar-divider"),
@@ -649,23 +654,23 @@ def section_intro():
             html.Th("Descripción"),
         ])),
         html.Tbody([
-            html.Tr([html.Td("NOM_667_OPS_GRUPO"), html.Td(dbc.Badge("Objetivo",  color="danger",    pill=True)), html.Td("Grupo de causa de muerte — 7 categorías OPS")]),
-            html.Tr([html.Td("ANO / MES"),          html.Td(dbc.Badge("Temporal",  color="info",      pill=True)), html.Td("Año (2012–2021) y mes de fallecimiento")]),
-            html.Tr([html.Td("SEXO"),               html.Td(dbc.Badge("Demog.",    color="success",   pill=True)), html.Td("Masculino / Femenino / Indeterminado")]),
-            html.Tr([html.Td("EDAD_SIMPLE"),        html.Td(dbc.Badge("Numérica",  color="warning",   pill=True)), html.Td("Edad en años al momento del fallecimiento")]),
-            html.Tr([html.Td("ETAREO_QUIN"),        html.Td(dbc.Badge("Categ.",    color="secondary", pill=True)), html.Td("Grupo etario quinquenal")]),
-            html.Tr([html.Td("EST_CIVIL"),          html.Td(dbc.Badge("Categ.",    color="secondary", pill=True)), html.Td("Estado civil del fallecido")]),
-            html.Tr([html.Td("SEG_SOCIAL"),         html.Td(dbc.Badge("Categ.",    color="secondary", pill=True)), html.Td("Régimen de seguridad social")]),
-            html.Tr([html.Td("NIVEL_EDU_GRUPO"),    html.Td(dbc.Badge("Categ.",    color="secondary", pill=True)), html.Td("Nivel educativo agrupado")]),
-            html.Tr([html.Td("COMUNA_RES"),         html.Td(dbc.Badge("Geog.",     color="primary",   pill=True)), html.Td("Comuna de residencia (22 comunas)")]),
+            html.Tr([html.Td("NOM_667_OPS_GRUPO"), html.Td(dbc.Badge("Objetivo", color="light", pill=True, style={"background":"#FDECEA","color":"#922B21","fontWeight":"600","border":"1px solid #F1948A","fontSize":"0.75rem"})), html.Td("Grupo de causa de muerte — 7 categorías OPS")]),
+            html.Tr([html.Td("ANO / MES"),          html.Td(dbc.Badge("Temporal", color="light", pill=True, style={"background":"#D4E6F5","color":"#1A4A7A","fontWeight":"500","fontSize":"0.75rem"})), html.Td("Año (2012–2021) y mes de fallecimiento")]),
+            html.Tr([html.Td("SEXO"),               html.Td(dbc.Badge("Demog.",   color="light", pill=True, style={"background":"#D5EAE7","color":"#1A4A3A","fontWeight":"500","fontSize":"0.75rem"})), html.Td("Masculino / Femenino / Indeterminado")]),
+            html.Tr([html.Td("EDAD_SIMPLE"),        html.Td(dbc.Badge("Numérica", color="light", pill=True, style={"background":"#FDEBD0","color":"#7D4A00","fontWeight":"500","fontSize":"0.75rem"})), html.Td("Edad en años al momento del fallecimiento")]),
+            html.Tr([html.Td("ETAREO_QUIN"),        html.Td(dbc.Badge("Categ.",   color="light", pill=True, style={"background":"#EAF0F6","color":"#3D5266","fontWeight":"500","fontSize":"0.75rem"})), html.Td("Grupo etario quinquenal")]),
+            html.Tr([html.Td("EST_CIVIL"),          html.Td(dbc.Badge("Categ.",   color="light", pill=True, style={"background":"#EAF0F6","color":"#3D5266","fontWeight":"500","fontSize":"0.75rem"})), html.Td("Estado civil del fallecido")]),
+            html.Tr([html.Td("SEG_SOCIAL"),         html.Td(dbc.Badge("Categ.",   color="light", pill=True, style={"background":"#EAF0F6","color":"#3D5266","fontWeight":"500","fontSize":"0.75rem"})), html.Td("Régimen de seguridad social")]),
+            html.Tr([html.Td("NIVEL_EDU_GRUPO"),    html.Td(dbc.Badge("Categ.",   color="light", pill=True, style={"background":"#EAF0F6","color":"#3D5266","fontWeight":"500","fontSize":"0.75rem"})), html.Td("Nivel educativo agrupado")]),
+            html.Tr([html.Td("COMUNA_RES"),         html.Td(dbc.Badge("Geog.",    color="light", pill=True, style={"background":"#E8EAF6","color":"#2C3A7A","fontWeight":"500","fontSize":"0.75rem"})), html.Td("Comuna de residencia (22 comunas)")]),
         ])
-    ], striped=True, hover=True, size="sm", className="table-dark")
+    ], bordered=False, size="sm", className="tabla-vars")
 
     return html.Div([
 
         # ── Header ──────────────────────────────────────────────────────────
         html.Div([
-            html.H2("Análisis de Mortalidad Urbana", className="section-title"),
+            html.H2("Análisis de Mortalidad en Medellín", className="section-title"),
             html.P(
                 "Exploración estadística de 145,377 defunciones registradas en Medellín "
                 "entre 2012 y 2021, clasificadas según grupos de la Organización "
@@ -714,8 +719,9 @@ def section_intro():
         # ── Variables table ──────────────────────────────────────────────────
         html.Div([
             html.Div([
-                html.Span("📋", style={"marginRight": "8px"}),
-                html.Span("Descripción del Dataset",
+                html.I(className="bi bi-table me-2",
+                       style={"color": "#2E86C1", "fontSize": "1rem"}),
+                html.Span("Variables del Dataset Post-Limpieza",
                           style={"fontFamily": "DM Sans, sans-serif", "fontWeight": "600",
                                  "fontSize": "1rem", "color": "#1A2B3C"}),
             ], style={"marginBottom": "16px", "display": "flex", "alignItems": "center"}),
@@ -900,7 +906,9 @@ def section_univariado():
 
         dbc.Card(dbc.CardBody(
             dcc.Graph(id="graph-univariado", config={"displayModeBar": False})
-        ), className="stat-card"),
+        ), className="stat-card mb-3"),
+
+        html.Div(id="desc-univariado"),
     ])
 
 def section_bivariado():
@@ -938,7 +946,9 @@ def section_bivariado():
 
         dbc.Card(dbc.CardBody(
             dcc.Graph(id="graph-bivariado", config={"displayModeBar": False})
-        ), className="stat-card"),
+        ), className="stat-card mb-3"),
+
+        html.Div(id="desc-bivariado"),
     ])
 
 def section_modelo():
@@ -999,35 +1009,91 @@ def section_modelo():
         )],
     )
 
+    # ── KPI cards comparativas ────────────────────────────────────────────────
+    rf_row  = metrics_df[metrics_df["Modelo"] == "Random Forest"].iloc[0]
+    dt_row  = metrics_df[metrics_df["Modelo"] == "Árbol de Decisión"].iloc[0]
+
+    def kpi_pair(label, col, is_main=False):
+        rf_val = rf_row[col]
+        dt_val = dt_row[col]
+        winner = "RF" if rf_val >= dt_val else "DT"
+        border = "3px solid #2E86C1" if is_main else "1px solid #E4ECF4"
+        bg     = "#F0F7FF" if is_main else "#FFFFFF"
+        return dbc.Col(html.Div([
+            html.Div(label, style={
+                "fontSize": "0.67rem", "fontWeight": "600", "letterSpacing": "0.08em",
+                "textTransform": "uppercase", "color": "#5A7290" if not is_main else "#1A5C8A",
+                "marginBottom": "14px",
+            }),
+            dbc.Row([
+                dbc.Col([
+                    html.Div(f"{rf_val:.1f}%", style={
+                        "fontFamily": "DM Serif Display, serif", "fontSize": "1.9rem",
+                        "color": "#1B4F72" if winner == "RF" else "#7F8C8D", "lineHeight": "1",
+                    }),
+                    html.Div("Random Forest", style={"fontSize": "0.72rem", "color": "#7A93AD", "marginTop": "4px"}),
+                ], width=6),
+                dbc.Col([
+                    html.Div(f"{dt_val:.1f}%", style={
+                        "fontFamily": "DM Serif Display, serif", "fontSize": "1.9rem",
+                        "color": "#1B4F72" if winner == "DT" else "#7F8C8D", "lineHeight": "1",
+                    }),
+                    html.Div("Árbol de Decisión", style={"fontSize": "0.72rem", "color": "#7A93AD", "marginTop": "4px"}),
+                ], width=6),
+            ]),
+            *([] if not is_main else [
+                html.Div("★ Métrica principal", style={
+                    "fontSize": "0.65rem", "color": "#2E86C1", "marginTop": "10px", "fontWeight": "600",
+                })
+            ]),
+        ], style={
+            "background": bg, "borderRadius": "12px", "padding": "18px 20px",
+            "border": border, "height": "100%",
+            "boxShadow": "0 2px 8px rgba(0,0,0,0.05)" if is_main else "none",
+        }), className="mb-3")
+
+    kpi_grid = dbc.Row([
+        kpi_pair("F1-Score Weighted",  "F1 Weighted ★", is_main=True),
+        kpi_pair("Accuracy",           "Accuracy"),
+        kpi_pair("F1 Macro",           "F1 Macro"),
+        kpi_pair("Recall Macro",       "Recall Macro"),
+    ], className="g-3 mb-4")
+
+    # ── Nota F1 weighted ─────────────────────────────────────────────────────
+    nota_f1 = html.Div([
+        html.Div([
+            html.I(className="bi bi-info-circle-fill me-2",
+                   style={"color": "#2E86C1", "fontSize": "0.9rem"}),
+            html.Span("¿Por qué F1-Score Weighted?", style={
+                "fontWeight": "600", "fontSize": "0.85rem", "color": "#1A2B3C",
+            }),
+        ], style={"marginBottom": "8px", "display": "flex", "alignItems": "center"}),
+        html.P(
+            "Con un ratio de desbalance 55:1, el Accuracy puede reportar valores altos "
+            "simplemente prediciendo siempre la clase mayoritaria. El F1-Score Weighted "
+            "promedia el F1 de cada clase ponderando por su soporte real, penalizando "
+            "los errores en clases minoritarias sin ignorar las mayoritarias.",
+            style={"fontSize": "0.83rem", "color": "#3D5266", "lineHeight": "1.6", "marginBottom": "0"},
+        ),
+    ], style={
+        "background": "#F0F7FF", "borderRadius": "10px", "padding": "16px 20px",
+        "border": "1px solid #C8DEF5", "borderLeft": "4px solid #2E86C1",
+        "marginBottom": "24px",
+    })
+
     # ── TAB 1: Métricas ───────────────────────────────────────────────────────
     tab_metricas = html.Div([
-        # Contexto desbalance
-        dbc.Alert([
-            html.Strong("⚠️ Desbalance de clases: ratio 55:1 "),
-            "(circulatorio 28.4% vs mal definidas 0.5%). ",
-            "El Accuracy puede ser engañoso — la métrica principal es el ",
-            html.Strong("F1-Score Weighted"), ". Se usó ",
-            html.Code("class_weight='balanced_subsample'"),
-            " en Random Forest y ",
-            html.Code("class_weight='balanced'"),
-            " en Árbol de Decisión.",
-        ], color="warning", className="mb-3 py-2"),
-
-        # Tabla
-        dbc.Card(dbc.CardBody([
-            html.P("★ F1 Weighted = métrica principal  |  verde = mejor valor por columna",
-                   className="text-muted small mb-2"),
-            metrics_table,
-        ]), className="mb-4"),
+        kpi_grid,
+        nota_f1,
 
         # Barras + Feature importance
         dbc.Row([
             dbc.Col(dbc.Card(dbc.CardBody(
                 dcc.Graph(figure=fig_bars, config={"displayModeBar": False})
-            )), md=7, className="mb-4"),
+            ), className="stat-card"), md=7, className="mb-4"),
             dbc.Col(dbc.Card(dbc.CardBody(
                 dcc.Graph(figure=fig_feat_imp(), config={"displayModeBar": False})
-            )), md=5, className="mb-4"),
+            ), className="stat-card"), md=5, className="mb-4"),
         ]),
 
         # Matriz de confusión
@@ -1048,67 +1114,130 @@ def section_modelo():
                 "Normalización por fila compensa el desbalance — cada fila suma 100%.",
                 className="text-muted mt-1 d-block"
             ),
-        ])),
+        ]), className="stat-card mb-4"),
 
-        # Conclusión del notebook
-        html.Hr(className="my-4"),
-        dbc.Alert([
-            html.H6("📌 Conclusión — Modelo seleccionado: Random Forest", className="mb-2"),
-            html.Ul([
-                html.Li([html.Strong("F1 Weighted: "), "37.52% vs 34.51% (+3 pp) — métrica principal bajo desbalance."]),
-                html.Li([html.Strong("F1 Macro: "),    "38.85% vs 36.50% — mejor detección en clases minoritarias."]),
-                html.Li([html.Strong("Recall Macro: "),"46.30% vs 44.60% — mayor cobertura real entre todas las clases."]),
-                html.Li([html.Strong("Límite del modelo: "), "las 3 clases mayoritarias (circulatorio, neoplasias, otras) comparten "
-                         "perfil etario similar — la edad explica el 60.7% de importancia pero no es "
-                         "suficiente para separar esas clases."]),
-                html.Li([html.Strong("class_weight='balanced_subsample': "), "ajusta pesos en cada árbol del ensamble, "
-                         "más robusto que 'balanced' en un árbol único con clases de soporte muy bajo."]),
-            ], className="mb-0"),
-        ], color="light", className="border border-primary mt-3"),
+        # ── Conclusión del modelado ──────────────────────────────────────────
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.I(className="bi bi-patch-check-fill me-2",
+                           style={"fontSize": "1.1rem", "color": "#A8DFCA"}),
+                    html.Span("Modelo seleccionado", style={
+                        "fontSize": "0.68rem", "fontWeight": "600", "letterSpacing": "0.1em",
+                        "textTransform": "uppercase", "color": "#A8DFCA",
+                    }),
+                ], style={"marginBottom": "10px", "display": "flex", "alignItems": "center"}),
+                html.P("Random Forest", style={
+                    "fontFamily": "DM Serif Display, serif", "fontSize": "1.6rem",
+                    "color": "#FFFFFF", "marginBottom": "4px",
+                }),
+                html.P("class_weight = 'balanced_subsample'", style={
+                    "fontFamily": "IBM Plex Mono, monospace", "fontSize": "0.78rem",
+                    "color": "#A8DFCA", "marginBottom": "20px",
+                }),
+            ]),
+            dbc.Row([
+                dbc.Col(html.Div([
+                    html.Div(f"{rf_row['F1 Weighted ★']:.2f}%",
+                             style={"fontFamily": "DM Serif Display, serif", "fontSize": "2rem",
+                                    "color": "#FFFFFF", "lineHeight": "1"}),
+                    html.Div("F1 Weighted ★", style={"fontSize": "0.7rem", "color": "#A8DFCA",
+                                                      "textTransform": "uppercase", "letterSpacing": "0.06em"}),
+                ]), md=3),
+                dbc.Col(html.Div([
+                    html.Div(f"{rf_row['F1 Macro']:.2f}%",
+                             style={"fontFamily": "DM Serif Display, serif", "fontSize": "2rem",
+                                    "color": "#FFFFFF", "lineHeight": "1"}),
+                    html.Div("F1 Macro", style={"fontSize": "0.7rem", "color": "#A8DFCA",
+                                                 "textTransform": "uppercase", "letterSpacing": "0.06em"}),
+                ]), md=3),
+                dbc.Col(html.Div([
+                    html.Div(f"{rf_row['Recall Macro']:.2f}%",
+                             style={"fontFamily": "DM Serif Display, serif", "fontSize": "2rem",
+                                    "color": "#FFFFFF", "lineHeight": "1"}),
+                    html.Div("Recall Macro", style={"fontSize": "0.7rem", "color": "#A8DFCA",
+                                                     "textTransform": "uppercase", "letterSpacing": "0.06em"}),
+                ]), md=3),
+                dbc.Col(html.P(
+                    "Random Forest superó al Árbol de Decisión en todas las métricas relevantes. "
+                    "El uso de 'balanced_subsample' — que ajusta pesos clase a clase en cada árbol "
+                    "del ensamble — resultó más robusto que 'balanced' en un árbol único frente "
+                    "a clases con soporte muy bajo.",
+                    style={"fontSize": "0.82rem", "color": "#D4E6F5", "lineHeight": "1.65", "marginBottom": "0"},
+                ), md=3),
+            ], className="g-3"),
+        ], style={
+            "background": "linear-gradient(135deg, #0F2E4A 0%, #1A4A7A 60%, #154360 100%)",
+            "borderRadius": "14px", "padding": "28px 32px",
+            "boxShadow": "0 4px 20px rgba(26,74,122,0.25)",
+        }),
     ], className="pt-3")
 
     # ── TAB 2: Predicción ────────────────────────────────────────────────────
-    tab_prediccion = html.Div([
-        dbc.Alert([
-            html.Strong("Modelo en producción: Random Forest"),
-            " — mayor F1 Weighted (37.52%) y Recall Macro (46.30%). "
-            "Selecciona Árbol de Decisión para comparar predicciones.",
-        ], color="info", className="mb-3 py-2"),
+    def lbl(texto):
+        return html.Div(texto, style={
+            "fontSize": "0.7rem", "fontWeight": "600", "letterSpacing": "0.06em",
+            "textTransform": "uppercase", "color": "#5A7290", "marginBottom": "6px",
+        })
 
-        dbc.Card(dbc.CardBody([
+    tab_prediccion = html.Div([
+        # Banner contextual
+        html.Div([
+            html.Div([
+                html.I(className="bi bi-check-circle-fill me-2",
+                       style={"color": "#2A9D8F", "fontSize": "0.95rem"}),
+                html.Span("Modelo en producción: ", style={"fontWeight": "600", "color": "#1A2B3C"}),
+                html.Span("Random Forest", style={"fontWeight": "700", "color": "#1B4F72"}),
+                html.Span(" — F1 Weighted 37.52% · Recall Macro 46.30%",
+                          style={"color": "#5A7290", "fontSize": "0.85rem"}),
+            ], style={"display": "flex", "alignItems": "center", "flexWrap": "wrap", "gap": "4px"}),
+        ], style={
+            "background": "#F0F7FF", "border": "1px solid #C8DEF5",
+            "borderLeft": "4px solid #2E86C1", "borderRadius": "10px",
+            "padding": "14px 18px", "marginBottom": "20px",
+        }),
+
+        html.Div([
+            # ── Selector de modelo ──────────────────────────────────────────
+            html.Div([
+                lbl("Modelo a utilizar"),
+                dcc.RadioItems(
+                    id="pred-modelo",
+                    options=[
+                        {"label": "  Random Forest",     "value": "rf"},
+                        {"label": "  Árbol de Decisión", "value": "dt"},
+                    ],
+                    value="rf", inline=True,
+                    inputStyle={"marginRight": "6px"},
+                    labelStyle={
+                        "marginRight": "24px", "fontSize": "0.88rem",
+                        "color": "#1A2B3C", "cursor": "pointer",
+                    },
+                ),
+            ], style={"marginBottom": "24px"}),
+
+            html.Hr(style={"borderColor": "#E4ECF4", "margin": "0 0 24px 0"}),
+
+            # ── Inputs ─────────────────────────────────────────────────────
             dbc.Row([
                 dbc.Col([
-                    html.Label("Modelo:", className="fw-bold mb-1 small"),
-                    dcc.RadioItems(
-                        id="pred-modelo",
-                        options=[
-                            {"label": "  Random Forest",     "value": "rf"},
-                            {"label": "  Árbol de Decisión", "value": "dt"},
-                        ],
-                        value="rf", inline=True, className="mb-4",
-                        inputStyle={"marginRight": "6px"},
-                        labelStyle={"marginRight": "20px"},
-                    ),
-                ], md=12),
-
-                dbc.Col([
-                    html.Label("Sexo", className="text-muted small"),
+                    lbl("Sexo"),
                     mk_select("pred-sexo", ["Masculino","Femenino","Indeterminado"], "Seleccionar…"),
-                    html.Label("Estado Civil", className="text-muted small"),
+                    lbl("Estado Civil"),
                     mk_select("pred-estcivil", ["Soltero/a","Casado/a","Viudo/a","Unión libre","Separado/a","Sin info"], "Seleccionar…"),
-                    html.Label("Seguridad Social", className="text-muted small"),
+                    lbl("Seguridad Social"),
                     mk_select("pred-segsocial", ["Contributivo","Subsidiado","Excepción","Particular","Vinculado","Sin info"], "Seleccionar…"),
                 ], md=4),
 
                 dbc.Col([
-                    html.Label("Nivel Educativo", className="text-muted small"),
+                    lbl("Nivel Educativo"),
                     mk_select("pred-edu", ["Básica","Media","Técnico/Tecnológico","Superior","Sin info"], "Seleccionar…"),
-                    html.Label("Edad (años)", className="text-muted small"),
+                    lbl("Edad (años)"),
                     dcc.Slider(id="pred-edad", min=0, max=110, step=1, value=68,
                                marks={0:"0", 20:"20", 40:"40", 60:"60", 80:"80", 110:"110"},
                                tooltip={"placement":"bottom","always_visible":True},
                                className="mb-4"),
-                    html.Label("Año de defunción", className="text-muted small"),
+                    lbl("Año de defunción"),
                     dcc.Slider(id="pred-ano", min=2012, max=2021, step=1, value=2019,
                                marks={y: str(y) for y in range(2012, 2022, 2)},
                                tooltip={"placement":"bottom","always_visible":True},
@@ -1116,44 +1245,178 @@ def section_modelo():
                 ], md=4),
 
                 dbc.Col([
-                    html.Label("Mes", className="text-muted small"),
+                    lbl("Mes"),
                     dcc.Slider(id="pred-mes", min=1, max=12, step=1, value=6,
                                marks={1:"Ene",3:"Mar",6:"Jun",9:"Sep",12:"Dic"},
                                tooltip={"placement":"bottom","always_visible":True},
                                className="mb-4"),
-                    html.Br(),
+                    html.Div(style={"height": "16px"}),
                     dbc.Button(
-                        [html.I(className="bi bi-lightning-charge-fill me-2"), "Predecir"],
-                        id="btn-predecir", color="primary", size="lg",
-                        className="w-100 mt-2 fw-bold",
+                        [html.I(className="bi bi-cpu me-2"), "Ejecutar predicción"],
+                        id="btn-predecir",
+                        style={
+                            "width": "100%", "background": "#1B4F72", "border": "none",
+                            "borderRadius": "8px", "padding": "12px",
+                            "fontFamily": "DM Sans, sans-serif", "fontWeight": "600",
+                            "fontSize": "0.9rem", "letterSpacing": "0.02em",
+                            "transition": "background 0.18s ease",
+                        },
                     ),
                 ], md=4),
             ]),
-            html.Div(id="pred-output", className="mt-4"),
-        ])),
+
+            html.Div(id="pred-output", style={"marginTop": "28px"}),
+        ], className="stat-card", style={"padding": "28px 32px"}),
     ], className="pt-3")
 
     # ── Layout con Tabs ──────────────────────────────────────────────────────
     return html.Div([
         html.H2("Modelado Predictivo", className="section-title"),
-        html.P("Comparativa entre Random Forest y Árbol de Decisión para clasificar grupos OPS.",
+        html.P("Clasificación de NOM_667_OPS_GRUPO con dos modelos de ensamble y árbol simple.",
                className="section-subtitle"),
 
-        dbc.Alert([
-            html.Strong("Pipeline: "),
-            "Features: SEXO, EDAD_SIMPLE, EST_CIVIL, SEG_SOCIAL, NIVEL_EDU_GRUPO, ANO, MES  |  "
-            "LabelEncoder  |  80/20 stratified  |  ",
-            html.Code("class_weight"), " balanceado en ambos modelos  |  Train: 116,301  |  Test: 29,076",
-        ], color="light", className="border mb-4 py-2"),
+        # ── Card institucional de contexto ───────────────────────────────────
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.Span("Pipeline de modelado", style={
+                        "fontSize": "0.68rem", "fontWeight": "600", "letterSpacing": "0.1em",
+                        "textTransform": "uppercase", "color": "#5A7290", "display": "block",
+                        "marginBottom": "10px",
+                    }),
+                    html.P(
+                        "Se implementaron dos clasificadores supervisados para predecir el grupo OPS "
+                        "de una defunción. Dado el severo desbalance (ratio 55:1), ambos modelos "
+                        "utilizan class_weight para compensar clases minoritarias.",
+                        style={"fontSize": "0.87rem", "color": "#3D5266", "lineHeight": "1.65",
+                               "marginBottom": "12px"},
+                    ),
+                    dbc.Row([
+                        dbc.Col(html.Div([
+                            html.Code("Random Forest", style={"fontSize": "0.82rem", "color": "#1B4F72",
+                                                               "background": "#EBF5FB", "padding": "2px 8px",
+                                                               "borderRadius": "4px"}),
+                            html.Span(" → class_weight='balanced_subsample'",
+                                      style={"fontSize": "0.8rem", "color": "#5A7290", "marginLeft": "6px"}),
+                        ]), md=6),
+                        dbc.Col(html.Div([
+                            html.Code("Árbol de Decisión", style={"fontSize": "0.82rem", "color": "#1B4F72",
+                                                                    "background": "#EBF5FB", "padding": "2px 8px",
+                                                                    "borderRadius": "4px"}),
+                            html.Span(" → class_weight='balanced'",
+                                      style={"fontSize": "0.8rem", "color": "#5A7290", "marginLeft": "6px"}),
+                        ]), md=6),
+                    ]),
+                ], md=8),
+                dbc.Col([
+                    html.Div([
+                        html.Div("Split 80/20 estratificado", style={"fontSize": "0.8rem", "color": "#5A7290", "marginBottom": "6px"}),
+                        html.Div([
+                            html.Span("Train ", style={"fontSize": "0.72rem", "color": "#7A93AD", "textTransform": "uppercase"}),
+                            html.Span("116,301", style={"fontFamily": "DM Serif Display, serif",
+                                                         "fontSize": "1.4rem", "color": "#1A2B3C"}),
+                        ], style={"marginBottom": "4px"}),
+                        html.Div([
+                            html.Span("Test  ", style={"fontSize": "0.72rem", "color": "#7A93AD", "textTransform": "uppercase"}),
+                            html.Span("29,076", style={"fontFamily": "DM Serif Display, serif",
+                                                        "fontSize": "1.4rem", "color": "#1A2B3C"}),
+                        ]),
+                    ])
+                ], md=4),
+            ]),
+        ], className="stat-card", style={"padding": "24px 28px", "marginBottom": "28px"}),
 
         dbc.Tabs([
-            dbc.Tab(tab_metricas,   label="📊 Métricas de modelos",
-                    tab_id="tab-metricas",   className="border border-top-0 p-3"),
-            dbc.Tab(tab_prediccion, label="🎯 Predicción interactiva",
-                    tab_id="tab-prediccion", className="border border-top-0 p-3"),
+            dbc.Tab(tab_metricas,   label="Métricas de modelos",
+                    tab_id="tab-metricas",   className="border border-top-0 p-3",
+                    label_style={"fontFamily": "DM Sans, sans-serif", "fontWeight": "500",
+                                 "fontSize": "0.88rem", "color": "#5A7290", "letterSpacing": "0.02em"}),
+            dbc.Tab(tab_prediccion, label="Predicción interactiva",
+                    tab_id="tab-prediccion", className="border border-top-0 p-3",
+                    label_style={"fontFamily": "DM Sans, sans-serif", "fontWeight": "500",
+                                 "fontSize": "0.88rem", "color": "#5A7290", "letterSpacing": "0.02em"}),
         ], id="tabs-modelo", active_tab="tab-metricas"),
     ])
+def section_conclusiones():
+    hallazgos = [
+        ("bi-heart-pulse",    "#C0392B", "Causas circulatorias dominantes",
+         "Las enfermedades del sistema circulatorio representan la causa de muerte más frecuente "
+         "(~28%), seguidas de neoplasias (~22%) y causas externas (~18%). Estas tres categorías "
+         "concentran más del 65% de la mortalidad total en el período analizado."),
+        ("bi-gender-ambiguous","#2E86C1", "Desigualdad por sexo",
+         "Los hombres presentan mayor mortalidad por causas externas (violencia, accidentes), "
+         "mientras que en mujeres predominan las enfermedades circulatorias y neoplasias. "
+         "Esta brecha se mantiene estable durante toda la década."),
+        ("bi-person-lines-fill","#2A9D8F", "La edad como factor determinante",
+         "La edad explica el 60.7% de la importancia del modelo predictivo. Las causas perinatales "
+         "y congénitas se concentran en menores de 5 años; las crónicas y degenerativas en mayores "
+         "de 60. Las causas externas impactan desproporcionadamente a la población de 15–44 años."),
+        ("bi-graph-up-arrow",  "#E9A128", "Tendencias temporales 2012–2021",
+         "La mortalidad total presenta fluctuaciones anuales moderadas. Se detecta un incremento "
+         "notable en 2020–2021 asociado a causas respiratorias, coherente con el contexto de la "
+         "pandemia de COVID-19, que alteró la distribución habitual de causas de muerte."),
+        ("bi-shield-check",    "#546E8A", "Desigualdades socioeconómicas",
+         "El régimen subsidiado y el bajo nivel educativo están sobre-representados en causas "
+         "externas y mal definidas. Las personas sin seguridad social presentan un perfil de "
+         "mortalidad más temprana, reflejando inequidades estructurales en el acceso a salud."),
+        ("bi-cpu-fill",        "#1A4A7A", "Alcance y límites del modelado",
+         "Random Forest obtuvo F1 Weighted de 37.52%, superando al Árbol de Decisión (34.51%). "
+         "El rendimiento moderado refleja el solapamiento real entre clases: las tres causas "
+         "mayoritarias comparten un perfil demográfico similar, limitando la separabilidad."),
+    ]
+    return html.Div([
+        html.H2("Conclusiones del Análisis", className="section-title"),
+        html.P(
+            "Síntesis de los principales hallazgos del análisis exploratorio y el modelado predictivo "
+            "sobre mortalidad en Medellín 2012–2021.",
+            className="section-subtitle",
+        ),
 
+        # ── Hallazgos ────────────────────────────────────────────────────────
+        dbc.Row([
+            dbc.Col(html.Div([
+                html.Div([
+                    html.I(className=f"bi {icon}",
+                           style={"color": color, "fontSize": "1.1rem", "flexShrink": "0"}),
+                    html.Span(titulo, style={
+                        "fontWeight": "600", "fontSize": "0.87rem", "color": "#1A2B3C",
+                    }),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px", "marginBottom": "10px"}),
+                html.P(texto, style={
+                    "fontSize": "0.84rem", "color": "#3D5266", "lineHeight": "1.65", "marginBottom": "0",
+                }),
+                html.Div(style={
+                    "position": "absolute", "top": "0", "left": "0",
+                    "width": "4px", "height": "100%", "background": color,
+                    "borderRadius": "14px 0 0 14px",
+                }),
+            ], className="stat-card", style={"padding": "20px 24px", "height": "100%", "position": "relative", "overflow": "hidden"}),
+            md=6, className="mb-3")
+            for icon, color, titulo, texto in hallazgos
+        ], className="g-3 mb-4"),
+
+        # ── Cierre académico ─────────────────────────────────────────────────
+        html.Div([
+            html.Span("Reflexión final", style={
+                "fontSize": "0.68rem", "fontWeight": "600", "letterSpacing": "0.1em",
+                "textTransform": "uppercase", "color": "#8FA3BD", "display": "block", "marginBottom": "12px",
+            }),
+            html.P(
+                "Este dashboard demuestra que la mortalidad urbana no es un fenómeno aleatorio: "
+                "refleja estructuras demográficas, socioeconómicas y temporales que pueden ser "
+                "identificadas y cuantificadas a través del análisis de datos. Las visualizaciones "
+                "presentadas permiten a tomadores de decisiones y equipos de salud pública identificar "
+                "poblaciones en riesgo, priorizar intervenciones y monitorear cambios en los patrones "
+                "de mortalidad a lo largo del tiempo.",
+                style={"fontSize": "0.92rem", "color": "#CBD8E6", "lineHeight": "1.75", "marginBottom": "0"},
+            ),
+        ], style={
+            "background": "linear-gradient(135deg, #0F1E2E 0%, #1A2B3C 100%)",
+            "borderRadius": "14px", "padding": "30px 36px",
+            "border": "1px solid #1E3050",
+        }),
+    ])
+    
 
 # ---------- Layout principal ----------
 app.layout = html.Div([
@@ -1185,14 +1448,15 @@ app.layout = html.Div([
 # 5. CALLBACKS
 # =============================================================================
 
-SECTIONS = ["intro", "problema", "objetivos", "univariado", "bivariado", "modelo"]
+SECTIONS = ["intro", "problema", "objetivos", "univariado", "bivariado", "modelo", "conclusiones"]
 SECTION_FN = {
-    "intro":       section_intro,
-    "problema":    section_problema,
-    "objetivos":   section_objetivos,
-    "univariado":  section_univariado,
-    "bivariado":   section_bivariado,
-    "modelo":      section_modelo,
+    "intro":         section_intro,
+    "problema":      section_problema,
+    "objetivos":     section_objetivos,
+    "univariado":    section_univariado,
+    "bivariado":     section_bivariado,
+    "modelo":        section_modelo,
+    "conclusiones":  section_conclusiones,
 }
 
 # Navegación: actualizar sección activa
@@ -1217,15 +1481,15 @@ def render_section(section):
     return SECTION_FN.get(section, section_intro)()
 
 # Actualizar estilos de botones activos
-#@app.callback(
-#    [Output(f"btn-{s}", "className") for s in SECTIONS],
-#    Input("active-section", "data"),
-#)
-#def update_nav_styles(active):
-#    return [
-#        f"nav-btn btn btn-link {'nav-btn-active' if s == active else ''}"
-#        for s in SECTIONS
-#    ]
+@app.callback(
+    [Output(f"btn-{s}", "className") for s in SECTIONS],
+    Input("active-section", "data"),
+)
+def update_nav_styles(active):
+    return [
+        f"nav-btn btn btn-link {'nav-btn-active' if s == active else ''}"
+        for s in SECTIONS
+    ]
 
 # Matriz de confusión dinámica
 @app.callback(
@@ -1309,6 +1573,36 @@ def predict(n, modelo, sexo, estcivil, segsocial, edu, edad, ano, mes):
             dcc.Graph(figure=fig_proba, config={"displayModeBar": False}),
         ]), className="stat-card"), md=7),
     ])
+# Descripciones univariado
+_UNIV_DESC = {
+    "ops":  ("bi-bar-chart-line", "#1B4F72", "Las enfermedades circulatorias concentran ~28% de las defunciones. Tres grupos explican más del 65% de la mortalidad total del período."),
+    "sexo": ("bi-gender-ambiguous", "#2E86C1", "Los hombres representan la mayoría de fallecidos. La brecha es especialmente pronunciada en causas externas (violencia y accidentes)."),
+    "edad": ("bi-person-fill", "#2A9D8F", "La distribución se concentra en adultos mayores de 60–85 años, con un segundo pico en edades jóvenes asociado a causas externas."),
+    "seg":  ("bi-shield-fill", "#546E8A", "Los regímenes contributivo y subsidiado agrupan la mayoría de registros, reflejando la estructura del sistema de salud colombiano."),
+    "edu":  ("bi-mortarboard-fill", "#E9A128", "La mayoría de registros corresponden a educación básica o media, coherente con el perfil demográfico de la población fallecida."),
+    "anual":("bi-graph-up", "#2E86C1", "La mortalidad se mantiene estable entre 2012–2019. Se detecta un incremento en 2020–2021 asociado al contexto de la pandemia COVID-19."),
+}
+
+@app.callback(
+    Output("desc-univariado", "children"),
+    Input("dd-univariado", "value"),
+)
+def update_desc_univariado(val):
+    icon, color, texto = _UNIV_DESC.get(val, ("bi-info-circle", "#5A7290", ""))
+    return html.Div([
+        html.I(className=f"bi {icon} me-2", style={"color": color, "fontSize": "0.85rem"}),
+        html.Span(texto, style={"fontSize": "0.83rem", "color": "#3D5266", "lineHeight": "1.6"}),
+    ], style={
+        "background": "#F7FAFD",
+        "border": "1px solid #E4ECF4",
+        "borderLeft": f"3px solid {color}",
+        "borderRadius": "8px",
+        "padding": "12px 16px",
+        "display": "flex",
+        "alignItems": "flex-start",
+        "gap": "4px",
+    })
+
 # Callback univariado
 @app.callback(
     Output("graph-univariado", "figure"),
@@ -1337,6 +1631,35 @@ def update_bivariado(val):
         "seg":     fig_ops_seg,
         "heatmap": fig_heatmap_edad_ops,
     }[val]()
+
+# Descripción dinámica bivariado
+_BIV_DESC = {
+    "sexo":    ("bi-gender-ambiguous", "#2E86C1", "Las causas externas muestran la mayor brecha de género: predominio masculino marcado. En enfermedades circulatorias y neoplasias la distribución es más equilibrada."),
+    "edad":    ("bi-person-fill",      "#2A9D8F", "Las causas perinatales y externas concentran fallecidos jóvenes; las enfermedades crónicas (circulatorias, neoplasias) afectan principalmente a mayores de 60 años."),
+    "anual":   ("bi-graph-up",         "#546E8A", "Las enfermedades circulatorias lideran consistentemente. Se detecta un incremento en causas respiratorias en 2020–2021, coherente con el impacto de la pandemia."),
+    "seg":     ("bi-shield-fill",      "#1B4F72", "El régimen subsidiado está sobre-representado en causas mal definidas y externas, sugiriendo menor acceso a diagnóstico oportuno y atención preventiva."),
+    "heatmap": ("bi-grid-3x3-gap-fill","#E9A128", "Los grupos etarios extremos (<5 y >75 años) muestran perfiles de causa de muerte claramente diferenciados del resto de la población."),
+}
+
+@app.callback(
+    Output("desc-bivariado", "children"),
+    Input("dd-bivariado", "value"),
+)
+def update_desc_bivariado(val):
+    icon, color, texto = _BIV_DESC.get(val, ("bi-info-circle", "#5A7290", ""))
+    return html.Div([
+        html.I(className=f"bi {icon} me-2", style={"color": color, "fontSize": "0.85rem"}),
+        html.Span(texto, style={"fontSize": "0.83rem", "color": "#3D5266", "lineHeight": "1.6"}),
+    ], style={
+        "background": "#F7FAFD",
+        "border": "1px solid #E4ECF4",
+        "borderLeft": f"3px solid {color}",
+        "borderRadius": "8px",
+        "padding": "12px 16px",
+        "display": "flex",
+        "alignItems": "flex-start",
+        "gap": "4px",
+    })
 
 # =============================================================================
 # 6. MAIN
